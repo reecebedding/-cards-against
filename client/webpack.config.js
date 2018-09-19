@@ -1,36 +1,56 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require('webpack');
+const resolve = require('path').resolve;
 
 module.exports = {
-    entry: [
-        './src/index.js'
-    ],
-
+    entry: {
+        main: './src/index.tsx'
+    },
+    
     output: {
+        path: resolve('dist'),
         publicPath: '/',
-        filename: './main.js'
+        filename: './index.js'
     },
 
+    devtool: "inline-source-map",
+
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: [".ts", ".tsx", ".js", ".json"]
     },
 
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
-                exclude: '/node_modules/',
-                use: ['babel-loader']
+                test: /\.tsx?$/,
+                use: [
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            babelrc: true
+                        }
+                    },
+                    {
+                        loader: "awesome-typescript-loader"
+                    },
+                    {
+                        loader: "tslint-loader"
+                    }
+                ],
+                exclude: "/node_modules/"
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                use: {
-                    loader: 'file-loader',
-                    options: {
+                use: [
+                    {
+                      loader: 'file-loader',
+                      options: {
                         name: 'public/img/[name].[ext]',
                         outputPath: 'dist/img/'
+                      }
                     }
-                }
+                  ]
             },
             {
                 test: /\.scss$/,
@@ -60,6 +80,10 @@ module.exports = {
     },
 
     plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        }),
         new ExtractTextPlugin({ filename: 'style.css' }),
         new HtmlWebpackPlugin({
             template: './resources/index.html',
