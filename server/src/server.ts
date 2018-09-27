@@ -1,10 +1,10 @@
-import { Socket } from "socket.io";
 import * as path from "path";
 import * as express from "express";
+import * as GameLogic from "./controllers/sockets/gameLogic";
 
 const app = express();
 const server = require('http').Server(app);
-const io = require("socket.io")(server);
+const socket_server = require("socket.io")(server);
 
 let port = 5000 || process.env.PORT;
 
@@ -12,6 +12,4 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 server.listen(port);
 
-io.on('connection', function(socket: Socket){
-	console.log('New Connection');
-});
+GameLogic.InitListeners(socket_server);
