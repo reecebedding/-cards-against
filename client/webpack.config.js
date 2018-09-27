@@ -44,11 +44,7 @@ module.exports = {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 use: [
                     {
-                      loader: 'file-loader',
-                      options: {
-                        name: 'public/img/[name].[ext]',
-                        outputPath: 'dist/img/'
-                      }
+                      loader: 'file-loader'
                     }
                   ]
             },
@@ -61,20 +57,19 @@ module.exports = {
             },
             {
                 test: /\.(otf|ttf|eot|woff|woff2)$/,
-                loader: 'file-loader',
-                options: {
-                    name: 'public/fonts/[name].[ext]',
-                    outputPath: 'dist/fonts'
-                }
+                use: [
+                    {
+                        loader: 'file-loader'
+                    }
+                ]
             },
             {
                 test: /\.html$/,
-                use: {
-                    loader: 'html-loader',
-                    options: {
-                        minimize: true
+                use: [
+                    {
+                        loader: 'html-loader'
                     }
-                }
+                ]
             }
         ]
     },
@@ -87,8 +82,7 @@ module.exports = {
         new ExtractTextPlugin({ filename: 'style.css' }),
         new HtmlWebpackPlugin({
             template: './resources/index.html',
-            filename: './index.html',
-            hash: true
+            filename: './index.html'
         })
     ],
 
