@@ -3,14 +3,17 @@ import * as  ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import createHistory from "history/createBrowserHistory";
 import { Route, Switch, Router } from "react-router-dom";
+import { connect } from 'socket.io-client';
+
 
 import { Home } from "./components";
 
 import "../resources/scss/style.scss";
 
 import configureStore from './redux/store/configureStore';
-import { defaultState } from './redux/store/initialStates'
-const store = configureStore(defaultState);
+const store = configureStore();
+
+var socket = connect('http://localhost:5000');
 
 ReactDOM.render(
   <Router history={createHistory()}>
