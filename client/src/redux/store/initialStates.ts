@@ -1,6 +1,6 @@
-import { IDefault } from './IStoreStates'
+import { IGameState } from './IStoreStates'
+import * as gameStatus from '../../constants/gameStatusConstants';
 
-
-export const defaultState: IDefault = {
-    
+export const gameState: IGameState = {
+    gameStatus: gameStatus.SETTING_UP,
 }

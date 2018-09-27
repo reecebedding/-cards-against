@@ -1,3 +1,3 @@
-export interface IDefault {
-
+export interface IGameState {
+    gameStatus: string
 }

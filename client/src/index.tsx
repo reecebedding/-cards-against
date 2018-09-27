@@ -5,8 +5,7 @@ import createHistory from "history/createBrowserHistory";
 import { Route, Switch, Router } from "react-router-dom";
 import { connect } from 'socket.io-client';
 
-
-import { Home } from "./components";
+import { Game } from "./components";
 
 import "../resources/scss/style.scss";
 
@@ -19,7 +18,7 @@ ReactDOM.render(
   <Router history={createHistory()}>
     <Provider store={store}>
       <Switch>
-        <Route exact={true} path="/" component={Home} />
+        <Route exact={true} path="/" component={Game} />
       </Switch>
     </Provider>
   </Router>,
