@@ -12,13 +12,13 @@ import "../resources/scss/style.scss";
 import configureStore from './redux/store/configureStore';
 const store = configureStore();
 
-var socket = connect('http://localhost:5000');
+var socket: SocketIOClient.Socket = connect('http://localhost:5000');
 
 ReactDOM.render(
   <Router history={createHistory()}>
     <Provider store={store}>
       <Switch>
-        <Route exact={true} path="/" component={Game} />
+        <Route exact={true} path="/" render={() => { return <Game socket={socket} /> }} />
       </Switch>
     </Provider>
   </Router>,

@@ -1,3 +1,4 @@
 export interface IGameState {
-    gameStatus: string
+    gameStatus: string,
+    users: string[]
 }
