@@ -3,12 +3,11 @@ import { connect } from "react-redux";
 import { IGameState } from "../../redux/store/IStoreStates";
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
-import { startNewGameSuccess, userJoinedGameSuccess, userLeftGameSuccess } from "../../redux/actions/gameActions";
+import { userJoinedGame, userLeftGame } from "../../redux/actions/gameActions";
 
 interface IProps {
   socket: SocketIOClient.Socket,
   game: IGameState,
-  startGame: () => void,
   userJoined: (user: any) => void,
   userLeft: (user: any) => void
 }
@@ -39,7 +38,6 @@ class Game extends React.Component<IProps> {
           }
         </ol>
         </p>
-        <button className="btn" onClick={this.props.startGame}>Start</button>
       </div>
     );
   }
@@ -52,9 +50,8 @@ function mapStateToProps(state: any) {
 }
 function mapDispatchToProps(dispatch: ThunkDispatch<IGameState, null, AnyAction>) {
   return {
-    startGame: () => dispatch(startNewGameSuccess()),
-    userJoined: (user: any) => dispatch(userJoinedGameSuccess(user)),
-    userLeft: (user: any) => dispatch(userLeftGameSuccess(user))
+    userJoined: (user: any) => dispatch(userJoinedGame(user)),
+    userLeft: (user: any) => dispatch(userLeftGame(user))
   };
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Game);
