@@ -1,17 +1,21 @@
 import { GameModel } from "../../models/GameModel";
 import { Server } from "socket.io";
 import { Game } from "../../database/Game";
+import { plainToClass } from "class-transformer"
 
 export class LobbyActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
         socket.on('CREATE_NEW_GAME', async (game: GameModel) => {
-            game._id = createGameID();
-            socket.join(game._id);
+            const newGame = plainToClass(GameModel, game);
 
-            await Game.create(game);
+            newGame._id = createGameID();
+            newGame.players.push({ id: socket.id });
+            socket.join(newGame._id);
 
-            console.log(`Game '${game.name}' created`);
-            socket_server.emit('NEW_GAME_CREATED', game);
+            await Game.create(newGame);
+
+            console.log(`Game '${newGame.name}' created`);
+            socket_server.emit('NEW_GAME_CREATED', newGame);
         });
     }
 }

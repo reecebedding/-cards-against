@@ -5,6 +5,16 @@ export class Game {
 
     static async create(game: GameModel): Promise<void> {
         const db = await Database.db();
-        await db.collection('games').insert(game);
+        await db.collection('games').insertOne(game);
+    }
+
+    static async remove(id: string): Promise<void> {        
+        const db = await Database.db();
+        await db.collection('games').deleteOne({_id: id});
+    }
+
+    static async update(game: GameModel): Promise<void> {
+        const db = await Database.db();
+        await db.collection('games').updateOne({_id: game._id}, { $set: game });
     }
 }
