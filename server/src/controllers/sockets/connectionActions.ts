@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io";
-import { Game } from "../../models/Game";
+import { GameModel } from "../../models/GameModel";
 import { LobbyActions } from "./lobbyActions";
 
 export class ConnectionActions {

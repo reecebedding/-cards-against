@@ -1,11 +1,14 @@
-import { Game } from "../../models/Game";
+import { GameModel } from "../../models/GameModel";
 import { Server } from "socket.io";
+import { Game } from "../../database/Game";
 
 export class LobbyActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
-        socket.on('CREATE_NEW_GAME', (game: Game) => {
-            game.id = createGameID();
-            socket.join(game.id);
+        socket.on('CREATE_NEW_GAME', async (game: GameModel) => {
+            game._id = createGameID();
+            socket.join(game._id);
+
+            await Game.create(game);
 
             console.log(`Game '${game.name}' created`);
             socket_server.emit('NEW_GAME_CREATED', game);
