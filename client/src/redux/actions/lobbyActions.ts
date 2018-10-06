@@ -22,3 +22,10 @@ export interface ILoadLobbies extends Action {
 export function loadLobbies(games: Lobby[]): ILoadLobbies {
     return { type: LobbyKeys.LOAD_LOBBIES, games }
 }
+
+export interface ILobbyRemoved extends Action {
+    game: Lobby
+}
+export function lobbyRemoved(game: Lobby): ILobbyRemoved {
+    return { type: LobbyKeys.LOBBY_REMOVED, game }
+}

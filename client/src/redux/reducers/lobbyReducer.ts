@@ -17,6 +17,12 @@ export default function lobbyReducer(state = lobbyState, action: LobbyActions) {
                 lobbies: action.games
             }
 
+        case LobbyKeys.LOBBY_REMOVED:
+            return {
+                ...state,
+                lobbies: state.lobbies.filter(lobby => lobby._id != action.game._id)
+            }
+
         default:
             return state;
     }

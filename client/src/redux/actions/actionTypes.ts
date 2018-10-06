@@ -8,3 +8,4 @@ export type GameActions =
 export type LobbyActions = 
     & lobbyActions.ICreateNewGameAction
     & lobbyActions.ILoadLobbies
+    & lobbyActions.ILobbyRemoved

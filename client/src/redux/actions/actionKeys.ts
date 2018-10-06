@@ -5,5 +5,6 @@ export const GameKeys = {
 
 export const LobbyKeys = {
     CREATE_NEW_GAME: "CREATE_NEW_GAME",
-    LOAD_LOBBIES: "LOAD_LOBBIES"
+    LOAD_LOBBIES: "LOAD_LOBBIES",
+    LOBBY_REMOVED: "LOBBY_REMOVED"
 }
