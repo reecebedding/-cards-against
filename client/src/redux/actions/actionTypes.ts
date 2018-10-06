@@ -6,4 +6,5 @@ export type GameActions =
     & gameActions.IUserLeftGameAction
 
 export type LobbyActions = 
-    lobbyActions.ICreateNewGameAction
+    & lobbyActions.ICreateNewGameAction
+    & lobbyActions.ILoadLobbies

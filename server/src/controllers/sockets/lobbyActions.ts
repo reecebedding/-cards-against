@@ -17,6 +17,10 @@ export class LobbyActions {
             console.log(`Game '${newGame.name}' created`);
             socket_server.emit('NEW_GAME_CREATED', newGame);
         });
+
+        socket.on('LOAD_LOBBIES', async (response: (data:any) => any) => {
+            response(await Game.find());
+        });
     }
 }
 

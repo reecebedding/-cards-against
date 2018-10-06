@@ -4,18 +4,20 @@ import { ThunkDispatch } from 'redux-thunk';
 import { ILobbyState } from '../../redux/store/IStoreStates';
 import { AnyAction } from 'redux';
 import { Modal, Button, ModalHeader, ModalBody, ModalFooter, Label, Col, Input, FormFeedback, Form, FormGroup } from 'reactstrap';
-import { Game } from '../../models/Game';
-import { createNewGame } from '../../redux/actions/lobbyActions';
+import { Lobby as LobbyModel } from '../../models/Lobby';
+import { createNewGame, loadLobbies } from '../../redux/actions/lobbyActions';
+import { loadLobbyList } from '../../socket/actions/lobbyActions';
 
 interface IProps {
     socket: SocketIOClient.Socket,
-    lobbies: Game[],
-    createNewGame: (socket: SocketIOClient.Socket, game: Game) => void
+    lobbies: LobbyModel[],
+    createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => void,
+    loadLobbies: (socket: SocketIOClient.Socket) => void
 }
 
 interface IState {
     showNewGame: boolean,
-    newGame: Game
+    newGame: LobbyModel
 }
 
 class Lobby extends React.Component<IProps, IState> {
@@ -30,6 +32,8 @@ class Lobby extends React.Component<IProps, IState> {
                 _id: ''
             }
         }
+
+        props.loadLobbies(props.socket);
     }
 
     toggleShowNewGame = () => {
@@ -109,7 +113,8 @@ function mapStateToProps(state: any) {
 
 function mapDispatchToProps(dispatch: ThunkDispatch<ILobbyState, null, AnyAction>) {
     return {
-        createNewGame: (socket: SocketIOClient.Socket, game: Game) => dispatch(createNewGame(socket, game))
+        createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => dispatch(createNewGame(socket, game)),
+        loadLobbies: (socket: SocketIOClient.Socket) => loadLobbyList(socket, dispatch)
     };
 }
 

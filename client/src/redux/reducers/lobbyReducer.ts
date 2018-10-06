@@ -11,6 +11,12 @@ export default function lobbyReducer(state = lobbyState, action: LobbyActions) {
                 lobbies: [...state.lobbies, action.game]
             }
 
+        case LobbyKeys.LOAD_LOBBIES:
+            return {
+                ...state,
+                lobbies: action.games
+            }
+
         default:
             return state;
     }

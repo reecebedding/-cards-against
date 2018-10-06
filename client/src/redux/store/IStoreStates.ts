@@ -1,4 +1,4 @@
-import { Game } from "../../models/Game";
+import { Lobby } from "../../models/Lobby";
 
 export interface IGameState {
     gameStatus: string,
@@ -6,5 +6,5 @@ export interface IGameState {
 }
 
 export interface ILobbyState {
-    lobbies: Game[]
+    lobbies: Lobby[]
 }
