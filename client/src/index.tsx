@@ -15,7 +15,7 @@ import { ResponsesManager } from './socket/responses/responsesManager';
 
 import configureStore from './redux/store/configureStore';
 
-import Lobby from "./components/Lobby";
+import Lobby from "./components/Lobby/Lobby";
 
 const store: Store<{}, AnyAction> = configureStore();
 

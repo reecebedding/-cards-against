@@ -1,6 +1,5 @@
 export const GameKeys = {
-    USER_JOINED: "USER_JOINED",
-    USER_LEFT: "USER_LEFT"
+    JOINED_GAME: "JOINED_GAME"
 }
 
 export const LobbyKeys = {

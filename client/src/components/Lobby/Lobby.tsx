@@ -4,15 +4,17 @@ import { ThunkDispatch } from 'redux-thunk';
 import { ILobbyState } from '../../redux/store/IStoreStates';
 import { AnyAction } from 'redux';
 import { Modal, Button, ModalHeader, ModalBody, ModalFooter, Label, Col, Input, FormFeedback, Form, FormGroup } from 'reactstrap';
-import { Lobby as LobbyModel } from '../../models/Lobby';
+import { LobbyModel } from '../../models/Lobby';
 import { createNewGame, loadLobbies } from '../../redux/actions/lobbyActions';
-import { loadLobbyList } from '../../socket/actions/lobbyActions';
+import { loadLobbyList, joinGame } from '../../socket/actions/lobbyActions';
+import { LobbyList } from './LobbyList';
 
 interface IProps {
     socket: SocketIOClient.Socket,
     lobbies: LobbyModel[],
     createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => void,
-    loadLobbies: (socket: SocketIOClient.Socket) => void
+    loadLobbies: (socket: SocketIOClient.Socket) => void,
+    joinGame: (socket: SocketIOClient.Socket, id: string) => void
 }
 
 interface IState {
@@ -32,8 +34,10 @@ class Lobby extends React.Component<IProps, IState> {
                 _id: ''
             }
         }
+    }
 
-        props.loadLobbies(props.socket);
+    componentDidMount(){
+        this.props.loadLobbies(this.props.socket);
     }
 
     toggleShowNewGame = () => {
@@ -49,6 +53,10 @@ class Lobby extends React.Component<IProps, IState> {
 
     newGameDecline = () => {
         this.toggleShowNewGame();
+    }
+
+    joinGame = (id: string) => {
+        this.props.joinGame(this.props.socket, id);
     }
 
     validateNewGame = () => {
@@ -74,13 +82,7 @@ class Lobby extends React.Component<IProps, IState> {
                 <p>Lobby</p>
                 <div>
                     <p>Games</p>
-                    <ol> 
-                        {
-                            this.props.lobbies.map((item, index) => (
-                            <li key={index}>{item.name}</li>
-                            ))
-                        }
-                    </ol>
+                    <LobbyList lobbies={this.props.lobbies} joinGame={ this.joinGame } />
                 </div>
                 <Button color="primary" onClick={this.toggleShowNewGame}>New Game</Button>
 
@@ -114,7 +116,8 @@ function mapStateToProps(state: any) {
 function mapDispatchToProps(dispatch: ThunkDispatch<ILobbyState, null, AnyAction>) {
     return {
         createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => dispatch(createNewGame(socket, game)),
-        loadLobbies: (socket: SocketIOClient.Socket) => loadLobbyList(socket, dispatch)
+        loadLobbies: (socket: SocketIOClient.Socket) => loadLobbyList(socket, dispatch),
+        joinGame: (socket: SocketIOClient.Socket, id: string) => joinGame(socket, dispatch, id)
     };
 }
 

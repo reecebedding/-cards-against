@@ -1,16 +1,10 @@
 import { GameKeys } from './actionKeys';
 import { Action } from 'redux';
+import { LobbyModel } from '../../models/Lobby';
 
-export interface IUserJoinedGameAction extends Action {
-    user: any
+export interface IJoinedGame extends Action {
+    game: LobbyModel
 }
-export function userJoinedGame(user: any): IUserJoinedGameAction {
-    return { type: GameKeys.USER_JOINED, user}
-}
-
-export interface IUserLeftGameAction extends Action {
-    user: any
-}
-export function userLeftGame(user: any): IUserLeftGameAction {
-    return { type: GameKeys.USER_LEFT, user }
+export function joinedGame(game: LobbyModel): IJoinedGame {
+    return { type: GameKeys.JOINED_GAME, game }
 }

@@ -13,20 +13,22 @@ export class GameManager {
         return game;
     }
 
-    public static async joinGame(gameId: string, socket: SocketIO.Socket): Promise<void> {
+    public static async joinGame(gameId: string, socket: SocketIO.Socket): Promise<GameModel> {
         const game = await Game.findById(gameId);
-        game.players.push({ id: socket.id });
+        if(!game.players.some(x => x.id === socket.id)){
+            game.players.push({ id: socket.id });
 
-        socket.join(game._id);
-
-        await Game.update(game);
+            socket.join(game._id);    
+            return await Game.update(game);
+        } else {
+            return game;
+        }
     }
 
     public static async disconnectUserFromGames(userId: string, socketServer: Server): Promise<void> {
         const socketGames = await Player.findGames(userId);
 
         socketGames.forEach(async(game: GameModel) => {
-            socketServer.to(game._id).emit("USER_LEFT", userId);
             if(game.players.length == 1) {
                 //Remove game from DB as there will be no users left.
                 await Game.remove(game._id);
