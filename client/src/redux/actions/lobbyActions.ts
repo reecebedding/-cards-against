@@ -2,6 +2,7 @@ import { LobbyKeys } from './actionKeys';
 import { Action, Dispatch } from 'redux';
 import { LobbyModel } from '../../models/LobbyModel';
 import * as lobbySocket from '../../socket/actions/lobbyActions';
+import { GameModel } from '../../models/GameModel';
 
 export interface ICreateNewGameAction extends Action {
     game: LobbyModel
@@ -10,9 +11,9 @@ export function createNewGameSuccess(game: LobbyModel): ICreateNewGameAction {
     return { type: LobbyKeys.CREATE_NEW_GAME, game}
 }
 
-export function createNewGame(socket: SocketIOClient.Socket, game: LobbyModel) {
+export function createNewGame(socket: SocketIOClient.Socket, game: LobbyModel, created: (game: GameModel) => void) {
     return function(dispatch: Dispatch) {
-        lobbySocket.createNewGame(socket, game);
+        lobbySocket.createNewGame(socket, game, created);
     }
 }
 

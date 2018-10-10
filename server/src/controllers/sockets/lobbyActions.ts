@@ -6,12 +6,14 @@ import { GameManager } from "../../managers/gameManager";
 
 export class LobbyActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
-        socket.on('CREATE_NEW_GAME', async (game: GameModel) => {
+        socket.on('CREATE_NEW_GAME', async (game: GameModel, response:(game: GameModel) => void) => {
             const newGame = plainToClass(GameModel, game);
             
             GameManager.createGame(newGame, socket);     
             GameManager.joinGame(newGame._id, socket);
            
+            response(newGame);
+
             socket_server.emit('NEW_GAME_CREATED', newGame);
         });
 

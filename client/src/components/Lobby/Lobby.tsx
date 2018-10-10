@@ -10,13 +10,14 @@ import { loadLobbyList, joinGame } from '../../socket/actions/lobbyActions';
 import { LobbyList } from './LobbyList';
 import { withRouter } from 'react-router-dom';
 import { History } from 'history';
+import { GameModel } from '../../models/GameModel';
 
 interface IProps {
     socket: SocketIOClient.Socket,
     lobbies: LobbyModel[],
-    createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => void,
+    createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel, created: (game: GameModel) => void) => void,
     loadLobbies: (socket: SocketIOClient.Socket) => void,
-    joinGame: (socket: SocketIOClient.Socket, id: string, joined: () => void) => void,
+    joinGame: (socket: SocketIOClient.Socket, id: string, joined: (game: GameModel) => void) => void,
     history: History
 }
 
@@ -50,8 +51,11 @@ class Lobby extends React.Component<IProps, IState> {
     }
 
     newGameConfirm = () => {
-        this.props.createNewGame(this.props.socket, this.state.newGame)
-        this.toggleShowNewGame();
+        this.props.createNewGame(this.props.socket, this.state.newGame, async (game: GameModel) => {
+            this.toggleShowNewGame();
+            await this.joinGame(game._id);
+        })
+        
     }
 
     newGameDecline = () => {
@@ -59,7 +63,7 @@ class Lobby extends React.Component<IProps, IState> {
     }
 
     joinGame = async (id: string) => {
-        this.props.joinGame(this.props.socket, id, () => {
+        this.props.joinGame(this.props.socket, id, (game: GameModel) => {
             this.props.history.push("/play");
         });
     }
@@ -120,9 +124,9 @@ function mapStateToProps(state: any) {
 
 function mapDispatchToProps(dispatch: ThunkDispatch<ILobbyState, null, AnyAction>) {
     return {
-        createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => dispatch(createNewGame(socket, game)),
+        createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel, created: (game: GameModel) => void) => dispatch(createNewGame(socket, game, created)),
         loadLobbies: (socket: SocketIOClient.Socket) => loadLobbyList(socket, dispatch),
-        joinGame: (socket: SocketIOClient.Socket, id: string, joined: () => void) => joinGame(socket, dispatch, id, joined)
+        joinGame: (socket: SocketIOClient.Socket, id: string, joined: (game: GameModel) => void) => joinGame(socket, dispatch, id, joined)
     };
 }
 

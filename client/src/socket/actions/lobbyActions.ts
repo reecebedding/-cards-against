@@ -2,15 +2,18 @@ import { LobbyModel } from "../../models/LobbyModel";
 import { Dispatch } from "redux";
 import { loadLobbies } from "../../redux/actions/lobbyActions";
 import { joinedGame } from "../../redux/actions/gameActions";
+import { GameModel } from "../../models/GameModel";
 
-export function createNewGame(socket: SocketIOClient.Socket, game: LobbyModel) {
-    socket.emit('CREATE_NEW_GAME', game);
+export function createNewGame(socket: SocketIOClient.Socket, game: LobbyModel, created: (game: GameModel) => any) {
+    socket.emit('CREATE_NEW_GAME', game, (game: GameModel) =>{
+        created(game);
+    });
 }
 
-export function joinGame(socket: SocketIOClient.Socket, dispatch: Dispatch<any>, id: string, callback: () => any) {
-    socket.emit('JOIN_GAME', id, (game: LobbyModel) => {
+export function joinGame(socket: SocketIOClient.Socket, dispatch: Dispatch<any>, id: string, callback: (game: GameModel) => any) {
+    socket.emit('JOIN_GAME', id, (game: GameModel) => {
         dispatch(joinedGame(game));
-        callback();
+        callback(game);
     });
 }
 
