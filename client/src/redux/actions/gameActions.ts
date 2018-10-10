@@ -1,6 +1,6 @@
 import { GameKeys } from './actionKeys';
 import { Action } from 'redux';
-import { LobbyModel } from '../../models/Lobby';
+import { LobbyModel } from '../../models/LobbyModel';
 
 export interface IJoinedGame extends Action {
     game: LobbyModel

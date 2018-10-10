@@ -1,6 +1,6 @@
 import { LobbyKeys } from './actionKeys';
 import { Action, Dispatch } from 'redux';
-import { LobbyModel } from '../../models/Lobby';
+import { LobbyModel } from '../../models/LobbyModel';
 import * as lobbySocket from '../../socket/actions/lobbyActions';
 
 export interface ICreateNewGameAction extends Action {

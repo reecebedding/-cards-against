@@ -2,19 +2,22 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { ILobbyState } from '../../redux/store/IStoreStates';
-import { AnyAction } from 'redux';
+import { AnyAction, compose } from 'redux';
 import { Modal, Button, ModalHeader, ModalBody, ModalFooter, Label, Col, Input, FormFeedback, Form, FormGroup } from 'reactstrap';
-import { LobbyModel } from '../../models/Lobby';
+import { LobbyModel } from '../../models/LobbyModel';
 import { createNewGame, loadLobbies } from '../../redux/actions/lobbyActions';
 import { loadLobbyList, joinGame } from '../../socket/actions/lobbyActions';
 import { LobbyList } from './LobbyList';
+import { withRouter } from 'react-router-dom';
+import { History } from 'history';
 
 interface IProps {
     socket: SocketIOClient.Socket,
     lobbies: LobbyModel[],
     createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => void,
     loadLobbies: (socket: SocketIOClient.Socket) => void,
-    joinGame: (socket: SocketIOClient.Socket, id: string) => void
+    joinGame: (socket: SocketIOClient.Socket, id: string, joined: () => void) => void,
+    history: History
 }
 
 interface IState {
@@ -55,8 +58,10 @@ class Lobby extends React.Component<IProps, IState> {
         this.toggleShowNewGame();
     }
 
-    joinGame = (id: string) => {
-        this.props.joinGame(this.props.socket, id);
+    joinGame = async (id: string) => {
+        this.props.joinGame(this.props.socket, id, () => {
+            this.props.history.push("/play");
+        });
     }
 
     validateNewGame = () => {
@@ -89,13 +94,13 @@ class Lobby extends React.Component<IProps, IState> {
                 <Modal isOpen={this.state.showNewGame} backdrop="static">
                     <ModalHeader>New Game</ModalHeader>
                     <ModalBody>
-                        <Form>
+                        <div>
                             <FormGroup row>
                             <Label for="lobbyName">Game Name</Label>
                             <Input invalid={!this.validateNewGame()} value={this.state.newGame.name} name="name" onChange={this.handleTextChange}/>
                             <FormFeedback>Game name is required!</FormFeedback>
                             </FormGroup>
-                        </Form>
+                        </div>
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.newGameConfirm} disabled={!this.validateNewGame()}>Start</Button>
@@ -117,8 +122,11 @@ function mapDispatchToProps(dispatch: ThunkDispatch<ILobbyState, null, AnyAction
     return {
         createNewGame: (socket: SocketIOClient.Socket, game: LobbyModel) => dispatch(createNewGame(socket, game)),
         loadLobbies: (socket: SocketIOClient.Socket) => loadLobbyList(socket, dispatch),
-        joinGame: (socket: SocketIOClient.Socket, id: string) => joinGame(socket, dispatch, id)
+        joinGame: (socket: SocketIOClient.Socket, id: string, joined: () => void) => joinGame(socket, dispatch, id, joined)
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Lobby);
+export default compose(
+    withRouter,
+    connect(mapStateToProps, mapDispatchToProps)
+)(Lobby) as React.ComponentType<any>;

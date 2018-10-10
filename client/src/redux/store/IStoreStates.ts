@@ -1,8 +1,8 @@
-import { LobbyModel } from "../../models/Lobby";
+import { LobbyModel } from "../../models/LobbyModel";
+import { GameModel } from "../../models/GameModel";
 
 export interface IGameState {
-    gameStatus: string,
-    users: string[]
+    activeGame: GameModel
 }
 
 export interface ILobbyState {

@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { createNewGameSuccess, lobbyRemoved } from "../../redux/actions/lobbyActions";
-import { LobbyModel } from "../../models/Lobby";
+import { LobbyModel } from "../../models/LobbyModel";
 
 export function init(socket: SocketIOClient.Socket, dispatch: Dispatch<any>){
     socket.on('NEW_GAME_CREATED', (game: LobbyModel) => { dispatch(createNewGameSuccess(game)) });
