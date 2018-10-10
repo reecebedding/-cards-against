@@ -30,3 +30,10 @@ export interface ILobbyRemoved extends Action {
 export function lobbyRemoved(game: LobbyModel): ILobbyRemoved {
     return { type: LobbyKeys.LOBBY_REMOVED, game }
 }
+
+export interface ILobbyUpdated extends Action {
+    game: LobbyModel
+}
+export function lobbyUpdated(game: LobbyModel): ILobbyUpdated {
+    return { type: LobbyKeys.LOBBY_UPDATED, game }
+}

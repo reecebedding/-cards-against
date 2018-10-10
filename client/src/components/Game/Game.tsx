@@ -15,6 +15,18 @@ export class Game extends React.Component<IProps> {
         return (
             <div>
                 <h1>Game: {this.props.activeGame.name}</h1>
+                <div>
+                    <h2>Player List</h2>
+                    <ol>
+                        {
+                            this.props.activeGame.players.map((player) => {
+                                return (
+                                    <li>{player.id}</li>
+                                );
+                            })
+                        }
+                    </ol>
+                </div>
             </div>
         )
     }

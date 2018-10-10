@@ -4,7 +4,8 @@ import * as gameStatus from '../../constants/gameStatusConstants';
 export const gameState: IGameState = {
     activeGame: {
         _id: '',
-        name: ''
+        name: '',
+        players: []
     }
 }
 

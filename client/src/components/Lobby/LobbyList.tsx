@@ -12,7 +12,9 @@ export const LobbyList: React.StatelessComponent<IProps> = (props: IProps) => { 
         <ol> 
             {
                 props.lobbies.map((lobby: LobbyModel, index: number) => (
-                    <li key={index}>{lobby.name} <Button color="primary" onClick={() => props.joinGame(lobby._id)}>Join</Button> </li>
+                    <li key={index}>
+                        {lobby.name} <Button color="primary" onClick={() => props.joinGame(lobby._id)}>Join</Button> - {lobby.players.length} players
+                    </li>
                 ))
             }
         </ol>

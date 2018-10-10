@@ -13,13 +13,18 @@ export class GameManager {
         return game;
     }
 
-    public static async joinGame(gameId: string, socket: SocketIO.Socket): Promise<GameModel> {
+    public static async joinGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel> {
         const game = await Game.findById(gameId);
         if(!game.players.some(x => x.id === socket.id)){
-            game.players.push({ id: socket.id });
+            const player = { id: socket.id };
+            game.players.push(player);
 
             socket.join(game._id);    
-            return await Game.update(game);
+            const updatedGame: GameModel = await Game.update(game);
+
+            socketServer.emit("LOBBY_UPDATED", updatedGame);
+            socketServer.to(gameId).emit("GAME_PLAYER_JOINED", player);
+            return updatedGame;
         } else {
             return game;
         }
@@ -35,8 +40,13 @@ export class GameManager {
                 console.log(`Game '${game.name} closed`)
                 socketServer.emit("LOBBY_REMOVED", game);
             }else{
-                game.players = game.players.filter((player) => player.id !== userId)
-                await Game.update(game);
+                const player: Player = { id: userId };
+                game.players = game.players.filter((player) => player.id !== userId);
+                const updatedGame: GameModel = await Game.update(game);
+
+                socketServer.to(updatedGame._id).emit("GAME_PLAYER_LEFT", player);
+                socketServer.emit("LOBBY_UPDATED", updatedGame);    
+                return updatedGame;
             }
         })
     }

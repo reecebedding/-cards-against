@@ -10,7 +10,7 @@ export class LobbyActions {
             const newGame = plainToClass(GameModel, game);
             
             GameManager.createGame(newGame, socket);     
-            GameManager.joinGame(newGame._id, socket);
+            GameManager.joinGame(newGame._id, socket, socket_server);
            
             response(newGame);
 
@@ -22,7 +22,7 @@ export class LobbyActions {
         });
 
         socket.on('JOIN_GAME', async(gameId: string, response:(game: GameModel) => void) => {
-            const game = await GameManager.joinGame(gameId, socket);
+            const game = await GameManager.joinGame(gameId, socket, socket_server);
             response(game);
         });
     }

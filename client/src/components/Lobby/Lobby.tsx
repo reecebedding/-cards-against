@@ -35,7 +35,8 @@ class Lobby extends React.Component<IProps, IState> {
             showNewGame: false,
             newGame: {
                 name: '',
-                _id: ''
+                _id: '',
+                players: []
             }
         }
     }
