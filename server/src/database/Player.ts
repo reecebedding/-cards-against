@@ -1,4 +1,4 @@
-import { Database } from "./database";
+import { Database } from "./Database";
 import { GameModel } from "../models/GameModel";
 import { plainToClass } from "class-transformer";
 import { Db } from "mongodb";

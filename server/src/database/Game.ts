@@ -1,5 +1,5 @@
 import { GameModel } from "../models/GameModel";
-import { Database } from "./database";
+import { Database } from "./Database";
 import { Db } from "mongodb";
 
 export class Game {
