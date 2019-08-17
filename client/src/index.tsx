@@ -20,7 +20,7 @@ import Game  from "./components/Game/Game";
 
 const store: Store<{}, AnyAction> = configureStore();
 
-var socket: SocketIOClient.Socket = connect('http://localhost:5000');
+const socket: SocketIOClient.Socket = connect('http://localhost:5000');
 ResponsesManager.init(socket, store.dispatch);
 
 ReactDOM.render(

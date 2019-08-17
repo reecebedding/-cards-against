@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { PlayerModel } from "../../models/PlayerModel";
-import { playerJoined, playerLeft } from "../../redux/actions/gameActions";
+import { playerJoined, playerLeft } from "../../components/Game/redux/actions";
 
 export function init(socket: SocketIOClient.Socket, dispatch: Dispatch<any>){
     socket.on("GAME_PLAYER_JOINED", (player: PlayerModel) => { dispatch(playerJoined(player)); });

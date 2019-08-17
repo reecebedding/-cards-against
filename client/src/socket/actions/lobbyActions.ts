@@ -1,7 +1,7 @@
 import { LobbyModel } from "../../models/LobbyModel";
 import { Dispatch } from "redux";
-import { loadLobbies } from "../../redux/actions/lobbyActions";
-import { joinedGame } from "../../redux/actions/gameActions";
+import { loadLobbies } from "../../components/Lobby/redux/actions";
+import { joinedGame } from "../../components/Game/redux/actions";
 import { GameModel } from "../../models/GameModel";
 
 export function createNewGame(socket: SocketIOClient.Socket, game: LobbyModel, created: (game: GameModel) => any) {

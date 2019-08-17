@@ -1,6 +1,12 @@
-import { LobbyKeys } from '../actions/actionKeys';
+import { LobbyKeys } from '../../components/Lobby/redux/keys';
+import * as actions from '../../components/Lobby/redux/actions';
 import { lobbyState } from '../store/initialStates';
-import { LobbyActions } from '../actions/actionTypes';
+
+type LobbyActions = 
+    actions.ICreateNewGameAction 
+    & actions.ILoadLobbies
+    & actions.ILobbyRemoved
+    & actions.ILobbyUpdated;
 
 export default function lobbyReducer(state = lobbyState, action: LobbyActions) {
     switch (action.type) {

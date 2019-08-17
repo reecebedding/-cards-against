@@ -1,6 +1,11 @@
-import { GameKeys } from '../actions/actionKeys';
+import { GameKeys } from '../../components/Game/redux/keys';
+import * as actions from '../../components/Game/redux/actions'
 import { gameState } from '../store/initialStates';
-import { GameActions } from '../actions/actionTypes';
+
+type GameActions = 
+     actions.IJoinedGame
+     & actions.IPlayerJoined
+     & actions.IPlayerLeft;
 
 export default function lobbyReducer(state = gameState, action: GameActions) {
     switch (action.type) {

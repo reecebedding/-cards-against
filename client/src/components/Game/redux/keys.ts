@@ -1,0 +1,5 @@
+export const GameKeys = {
+    JOINED_GAME: "JOINED_GAME",
+    PLAYER_JOINED: "PLAYER_JOINED",
+    PLAYER_LEFT: "PLAYER_LEFT"
+}

@@ -5,7 +5,7 @@ import { ILobbyState } from '../../redux/store/IStoreStates';
 import { AnyAction, compose } from 'redux';
 import { Modal, Button, ModalHeader, ModalBody, ModalFooter, Label, Col, Input, FormFeedback, Form, FormGroup } from 'reactstrap';
 import { LobbyModel } from '../../models/LobbyModel';
-import { createNewGame, loadLobbies } from '../../redux/actions/lobbyActions';
+import { createNewGame, loadLobbies } from './redux/actions';
 import { loadLobbyList, joinGame } from '../../socket/actions/lobbyActions';
 import { LobbyList } from './LobbyList';
 import { withRouter } from 'react-router-dom';

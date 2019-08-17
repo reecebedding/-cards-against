@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import { createNewGameSuccess, lobbyRemoved, lobbyUpdated } from "../../redux/actions/lobbyActions";
+import { createNewGameSuccess, lobbyRemoved, lobbyUpdated } from "../../components/Lobby/redux/actions";
 import { LobbyModel } from "../../models/LobbyModel";
 
 export function init(socket: SocketIOClient.Socket, dispatch: Dispatch<any>){

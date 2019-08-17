@@ -1,9 +1,3 @@
-export const GameKeys = {
-    JOINED_GAME: "JOINED_GAME",
-    PLAYER_JOINED: "PLAYER_JOINED",
-    PLAYER_LEFT: "PLAYER_LEFT"
-}
-
 export const LobbyKeys = {
     CREATE_NEW_GAME: "CREATE_NEW_GAME",
     LOAD_LOBBIES: "LOAD_LOBBIES",
