@@ -4,7 +4,8 @@ module.exports = {
     entry: './src/server.ts',
     output: {
         path: __dirname + '/dist',
-        filename: 'server.js'
+        filename: 'server.js',
+        devtoolModuleFilenameTemplate: '[absolute-resource-path]'
     },
     resolve:{
         extensions: ['.ts', '.js']
@@ -31,6 +32,7 @@ module.exports = {
             }
         ]
     },
+    devtool: "source-map",
     target: 'node',
     externals: [nodeExternals()]
 };

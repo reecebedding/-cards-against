@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all --parallel watch:build watch:server",
-    "watch:build": "webpack --watch",
+    "build": "webpack --mode development",
+    "watch:build": "webpack --watch --mode development",
     "watch:server": "nodemon \"./dist/server.js\" --watch \"./dist\""
   },
   "author": "",
@@ -25,9 +26,11 @@
     "@types/body-parser": "^1.17.0",
     "@types/express": "^4.16.0",
     "@types/socket.io": "^1.4.38",
+    "@types/source-map-support": "^0.5.0",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.4",
     "npm-run-all": "^4.1.5",
+    "source-map-support": "^0.5.13",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-loader": "^3.6.0",

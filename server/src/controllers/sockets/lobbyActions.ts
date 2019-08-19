@@ -9,8 +9,8 @@ export class LobbyActions {
         socket.on('CREATE_NEW_GAME', async (game: GameModel, response:(game: GameModel) => void) => {
             const newGame = plainToClass(GameModel, game);
             
-            GameManager.createGame(newGame, socket);     
-            GameManager.joinGame(newGame._id, socket, socket_server);
+            const createdGame: GameModel = await GameManager.createGame(newGame, socket);     
+            await GameManager.joinGame(createdGame._id, socket, socket_server);
            
             response(newGame);
 

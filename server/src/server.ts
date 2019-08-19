@@ -1,8 +1,13 @@
+import * as sourceMapSupport from "source-map-support";
+sourceMapSupport.install();
+process.on('unhandledRejection', console.log);
+
 import * as path from "path";
 import * as express from "express";
 import * as socket from "socket.io";
 import { SocketManager } from "./controllers/sockets/socketManager";
 import { Server as HttpServer } from "http"
+
 
 
 const app = express();
