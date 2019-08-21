@@ -10,7 +10,7 @@
             "name": "nodemon server",
             "runtimeExecutable": "nodemon",
             "preLaunchTask": "build_server",
-            "program": "${workspaceFolder}/server/src/server.ts",
+            "program": "${workspaceFolder}/server/dist/server.js",
             "restart": true,
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

@@ -1,22 +1,41 @@
-import { GameModel } from "../models/GameModel";
+import { GameModel, GameStatus } from "../models/GameModel";
 import { Game } from "../database/Game";
 import { Player } from "../database/Player";
 import { Server } from "socket.io";
+import { PlayerModel } from "src/models/PlayerModel";
+import { CardsManager } from "./cardsManager";
 
 export class GameManager {
     public static async createGame(newGame: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
         newGame._id = createGameID();
-        
+        newGame.hostId = socket.id;
+        newGame.gameStatus = GameStatus.SETUP;
+
         const game = await Game.create(newGame);
         console.log(`Game '${newGame.name}' created`);
 
         return game;
     }
 
+    public static async startGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel>{
+        const game: GameModel = await Game.findById(gameId);
+        //Only allow the game to be started by the host
+        if(game.hostId === socket.id)
+        {
+            game.gameStatus = GameStatus.PLAYING;
+            const updatedGame: GameModel = await Game.update(game);
+            socketServer.emit("LOBBY_UPDATED", updatedGame);
+            socketServer.to(gameId).emit("GAME_STARTED", game);
+            return updatedGame;
+        }
+        return game;
+    }
+
     public static async joinGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel> {
         const game = await Game.findById(gameId);
-        if(!game.players.some(x => x.id === socket.id)){
-            const player = { id: socket.id };
+        const playerId = socket.id;
+        if(!game.players.some(x => x.id === playerId)){
+            const player:PlayerModel = { id: playerId, gameId: gameId, cards: []};
             game.players.push(player);
 
             socket.join(game._id);    
@@ -24,6 +43,7 @@ export class GameManager {
 
             socketServer.emit("LOBBY_UPDATED", updatedGame);
             socketServer.to(gameId).emit("GAME_PLAYER_JOINED", player);
+            
             return updatedGame;
         } else {
             return game;

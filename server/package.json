@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm-run-all --parallel watch:build watch:server",
-    "build": "webpack --mode development",
+    "build": "npx webpack --mode development",
     "watch:build": "webpack --watch --mode development",
     "watch:server": "nodemon \"./dist/server.js\" --watch \"./dist\""
   },

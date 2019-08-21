@@ -25,6 +25,11 @@ export class LobbyActions {
             const game = await GameManager.joinGame(gameId, socket, socket_server);
             response(game);
         });
+
+        socket.on('START_GAME', async(gameId: string, response:(game: GameModel) => void) => {
+            const game = await GameManager.startGame(gameId, socket, socket_server);
+            response(game);
+        });
     }
 }
 

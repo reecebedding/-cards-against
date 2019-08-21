@@ -1,13 +1,15 @@
 import { GameKeys } from '../../components/Game/redux/keys';
 import * as actions from '../../components/Game/redux/actions'
 import { gameState } from '../store/initialStates';
+import { IGameState } from '../store/IStoreStates';
 
 type GameActions = 
      actions.IJoinedGame
      & actions.IPlayerJoined
-     & actions.IPlayerLeft;
+     & actions.IPlayerLeft
+     & actions.IGameStarted;
 
-export default function lobbyReducer(state = gameState, action: GameActions) {
+export default function lobbyReducer(state = gameState, action: GameActions): IGameState {
     switch (action.type) {
         
         case GameKeys.JOINED_GAME:
@@ -34,6 +36,15 @@ export default function lobbyReducer(state = gameState, action: GameActions) {
                 }
             }
 
+        case GameKeys.GAME_STARTED:
+            return {
+                ...state,
+                activeGame: {
+                    ...state.activeGame,
+                    gameStatus: action.game.gameStatus
+                }
+            }
+            
         default:
             return state;
     }
