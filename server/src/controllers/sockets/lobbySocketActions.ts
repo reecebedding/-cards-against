@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { Game } from "../../database/Game";
 import { plainToClass } from "class-transformer"
 import { GameManager } from "../../managers/gameManager";
+import { GameDTO } from "../dtoModels/gameDTO";
 
 export class LobbySocketActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
@@ -30,11 +31,13 @@ export class LobbySocketActions {
     }
 
     static emitLobbyUpdated(game: GameModel, socketServer: Server){
-        socketServer.emit("LOBBY_UPDATED", game);
+        const dtoGame: GameDTO = plainToClass(GameDTO, game);
+        socketServer.emit("LOBBY_UPDATED", dtoGame);
     }
 
     static emitLobbyRemoved(game: GameModel, socketServer: Server){
-        socketServer.emit("LOBBY_REMOVED", game);
+        const dtoGame: GameDTO = plainToClass(GameDTO, game);
+        socketServer.emit("LOBBY_REMOVED", dtoGame);
     }
 }
 
