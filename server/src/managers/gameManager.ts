@@ -3,7 +3,8 @@ import { Game } from "../database/Game";
 import { Player } from "../database/Player";
 import { Server } from "socket.io";
 import { PlayerModel } from "src/models/PlayerModel";
-import { CardsManager } from "./cardsManager";
+import { LobbySocketActions } from "../controllers/sockets/lobbySocketActions";
+import { GameSocketActions } from "../controllers/sockets/gameSocketActions";
 
 export class GameManager {
     public static async createGame(newGame: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
@@ -22,12 +23,15 @@ export class GameManager {
         //Only allow the game to be started by the host
         if(game.hostId === socket.id)
         {
-            game.gameStatus = GameStatus.PLAYING;
-            const updatedGame: GameModel = await Game.update(game);
-            socketServer.emit("LOBBY_UPDATED", updatedGame);
-            socketServer.to(gameId).emit("GAME_STARTED", game);
+            const gameWithPlayers: GameModel = await Game.findById(gameId);
+            gameWithPlayers.gameStatus = GameStatus.PLAYING;
+            const updatedGame: GameModel = await Game.update(gameWithPlayers);
+            
+            GameSocketActions.emitGameStarted(updatedGame, socketServer);
+            LobbySocketActions.emitLobbyRemoved(updatedGame, socketServer);
+                        
             return updatedGame;
-        }
+        } 
         return game;
     }
 
@@ -41,8 +45,8 @@ export class GameManager {
             socket.join(game._id);    
             const updatedGame: GameModel = await Game.update(game);
 
-            socketServer.emit("LOBBY_UPDATED", updatedGame);
-            socketServer.to(gameId).emit("GAME_PLAYER_JOINED", player);
+            LobbySocketActions.emitLobbyUpdated(updatedGame, socketServer);
+            GameSocketActions.emitPlayerJoined(game._id, player, socketServer);
             
             return updatedGame;
         } else {
@@ -58,14 +62,15 @@ export class GameManager {
                 //Remove game from DB as there will be no users left.
                 await Game.remove(game._id);
                 console.log(`Game '${game.name} closed`)
-                socketServer.emit("LOBBY_REMOVED", game);
+                LobbySocketActions.emitLobbyRemoved(game, socketServer);
             }else{
-                const player: Player = { id: userId };
+                const player:PlayerModel = { id: userId, gameId: game._id, cards: []};
                 game.players = game.players.filter((player) => player.id !== userId);
                 const updatedGame: GameModel = await Game.update(game);
 
-                socketServer.to(updatedGame._id).emit("GAME_PLAYER_LEFT", player);
-                socketServer.emit("LOBBY_UPDATED", updatedGame);    
+                GameSocketActions.emitPlayerLeft(updatedGame._id, player, socketServer)                
+                LobbySocketActions.emitLobbyUpdated(updatedGame, socketServer);
+                
                 return updatedGame;
             }
         })

@@ -4,7 +4,7 @@ import { Game } from "../../database/Game";
 import { plainToClass } from "class-transformer"
 import { GameManager } from "../../managers/gameManager";
 
-export class LobbyActions {
+export class LobbySocketActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
         socket.on('CREATE_NEW_GAME', async (game: GameModel, response:(game: GameModel) => void) => {
             const newGame = plainToClass(GameModel, game);
@@ -27,6 +27,14 @@ export class LobbyActions {
             const game = await GameManager.startGame(gameId, socket, socket_server);
             response(game);
         });
+    }
+
+    static emitLobbyUpdated(game: GameModel, socketServer: Server){
+        socketServer.emit("LOBBY_UPDATED", game);
+    }
+
+    static emitLobbyRemoved(game: GameModel, socketServer: Server){
+        socketServer.emit("LOBBY_REMOVED", game);
     }
 }
 

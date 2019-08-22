@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { ConnectionActions } from "./connectionActions";
-import { LobbyActions } from "./lobbyActions";
+import { LobbySocketActions } from "./lobbySocketActions";
+import { GameSocketActions } from "./gameSocketActions";
 
 export class SocketManager {
     static initListeners(socket_server: Server){
@@ -9,7 +10,8 @@ export class SocketManager {
             socket_server.emit("USER_JOINED", socket.id);
 
             ConnectionActions.init(socket_server, socket);
-            LobbyActions.init(socket_server, socket);
+            LobbySocketActions.init(socket_server, socket);
+            GameSocketActions.init(socket_server, socket);
         });
     }
 }

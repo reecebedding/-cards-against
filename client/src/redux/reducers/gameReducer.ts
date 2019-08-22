@@ -41,7 +41,8 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
                 ...state,
                 activeGame: {
                     ...state.activeGame,
-                    gameStatus: action.game.gameStatus
+                    gameStatus: action.game.gameStatus,
+                    players: action.game.players
                 }
             }
             
