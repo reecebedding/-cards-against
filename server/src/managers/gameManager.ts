@@ -3,8 +3,10 @@ import { Game } from "../database/Game";
 import { Player } from "../database/Player";
 import { Server } from "socket.io";
 import { PlayerModel } from "src/models/PlayerModel";
+import { CardsManager } from "./cardsManager";
 import { LobbySocketActions } from "../controllers/sockets/lobbySocketActions";
 import { GameSocketActions } from "../controllers/sockets/gameSocketActions";
+import CardModel from "src/models/CardModel";
 
 export class GameManager {
     public static async createGame(newGame: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
@@ -23,13 +25,18 @@ export class GameManager {
         //Only allow the game to be started by the host
         if(game.hostId === socket.id)
         {
+            for(const player of game.players) {
+                const cardsDealt: CardModel[] = await CardsManager.DealPlayerWhiteCards(player.id, gameId);
+                cardsDealt.forEach(card => GameSocketActions.emitPlayerGivenCard(player, card, socketServer));
+            }
+            
             const gameWithPlayers: GameModel = await Game.findById(gameId);
             gameWithPlayers.gameStatus = GameStatus.PLAYING;
             const updatedGame: GameModel = await Game.update(gameWithPlayers);
             
             GameSocketActions.emitGameStarted(updatedGame, socketServer);
-            LobbySocketActions.emitLobbyRemoved(updatedGame, socketServer);
-                        
+            LobbySocketActions.emitLobbyUpdated(updatedGame, socketServer);
+
             return updatedGame;
         } 
         return game;

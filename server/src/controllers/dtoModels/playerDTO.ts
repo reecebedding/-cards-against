@@ -1,7 +1,7 @@
-import { Expose, Exclude } from "class-transformer"
+import { Exclude, Expose } from "class-transformer"
 
 @Exclude()
 export class PlayerDTO {
     @Expose() id: string
-    @Expose() gameId: string
+    @Expose() gameId: string    
 }

@@ -6,6 +6,9 @@ import { IGameState } from "../../redux/store/IStoreStates";
 import { GameModel, GameStatus } from "../../models/GameModel";
 import Button from "reactstrap/lib/Button";
 import { startGame } from "./redux/actions";
+import Card from "reactstrap/lib/Card";
+import CardBody from "reactstrap/lib/CardBody";
+import CardTitle from "reactstrap/lib/CardTitle";
 
 interface IProps {
     socket: SocketIOClient.Socket,
@@ -36,7 +39,24 @@ export class Game extends React.Component<IProps> {
                     </ol>
                 </div>
                 {this.renderStartGame()}
+                {this.renderPlayerCards()}
             </div>
+        )
+    }
+
+    renderPlayerCards(){
+        return (
+            this.props.activeGame.players.filter(x => x.id === this.props.socket.id).map((player) => {
+                return player.cards.map((card) => {
+                    return (
+                        <Card>
+                            <CardBody>
+                                <CardTitle>{card.text}</CardTitle>
+                            </CardBody>
+                        </Card>
+                    )
+                });
+            })
         )
     }
 
