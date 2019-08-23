@@ -9,7 +9,8 @@ export class Player {
 
     static async findGames(id: string): Promise<GameModel[]> {
         return Database.execute(async (db: Db) => {
-            return plainToClass(GameModel, await db.collection('games').find({"players": { $all: [{id:id}] }}).toArray());
+            const games: GameModel[] = await db.collection('games').find({"players": { $elemMatch: {id:id} }}).toArray();            
+            return plainToClass(GameModel, games);
         })
     }
 
