@@ -92,7 +92,7 @@ class Lobby extends React.Component<IProps, IState> {
                 <p>Lobby</p>
                 <div>
                     <p>Games</p>
-                    <LobbyList lobbies={this.props.lobbies} joinGame={ this.joinGame } />
+                    <LobbyList lobbies={this.props.lobbies} joinGame={this.joinGame} />
                 </div>
                 <Button color="primary" onClick={this.toggleShowNewGame}>New Game</Button>
 
@@ -100,7 +100,7 @@ class Lobby extends React.Component<IProps, IState> {
                     <ModalHeader>New Game</ModalHeader>
                     <ModalBody>
                         <div>
-                            <FormGroup row>
+                            <FormGroup row={true}>
                             <Label for="lobbyName">Game Name</Label>
                             <Input invalid={!this.validateNewGame()} value={this.state.newGame.name} name="name" onChange={this.handleTextChange}/>
                             <FormFeedback>Game name is required!</FormFeedback>

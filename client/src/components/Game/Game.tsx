@@ -32,8 +32,8 @@ export class Game extends React.Component<IProps> {
                     <h2>Player List</h2>
                     <ol>
                         {
-                            this.props.activeGame.players.map((player) => {
-                                return <li>{player.id} {(player.id === this.props.activeGame.hostId) && "- HOST"}</li>;
+                            this.props.activeGame.players.map((player, index: number) => {
+                                return <li key={index}>{player.id} {(player.id === this.props.activeGame.hostId) && "- HOST"}</li>;
                             })
                         }
                     </ol>
@@ -47,9 +47,9 @@ export class Game extends React.Component<IProps> {
     renderPlayerCards(){
         return (
             this.props.activeGame.players.filter(x => x.id === this.props.socket.id).map((player) => {
-                return player.cards.map((card) => {
+                return player.cards.map((card, index: number) => {
                     return (
-                        <Card>
+                        <Card key={index}>
                             <CardBody>
                                 <CardTitle>{card.text}</CardTitle>
                             </CardBody>
