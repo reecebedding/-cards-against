@@ -6,10 +6,27 @@
         {
             "label": "build_server",
             "type": "npm",
-            "script": "build",
+            "script": "watch:build",   
+            "isBackground": true,         
             "path": "server/",
             "group": "build",
-            "problemMatcher": []
+            "problemMatcher": [
+                {
+                  "pattern": [
+                    {
+                      "regexp": ".",
+                      "file": 1,
+                      "location": 2,
+                      "message": 3
+                    }
+                  ],
+                  "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": ".",
+                  }
+                }
+              ]
         }
     ]
 }
