@@ -23,14 +23,19 @@ const store: Store<{}, AnyAction> = configureStore();
 const socket: SocketIOClient.Socket = connect('http://localhost:5000');
 ResponsesManager.init(socket, store.dispatch);
 
+const lobby = () => { return <Lobby socket={socket} /> }
+const game = () => { return <Game socket={socket} /> }
+
 ReactDOM.render(
-  <MemoryRouter>
-    <Provider store={store}>
-      <Switch>
-        <Route exact={true} path="/" render={() => { return <Lobby socket={socket} /> }} />
-        <Route exact={true} path="/play" render={() => { return <Game socket={socket} /> }} />
-      </Switch>
-    </Provider>
-  </MemoryRouter>,
+  (
+    <MemoryRouter>
+      <Provider store={store}>
+        <Switch>
+          <Route exact={true} path="/" render={lobby} />
+          <Route exact={true} path="/play" render={game} />
+        </Switch>
+      </Provider>
+    </MemoryRouter>
+  ),
   document.getElementById("root"),
 );
