@@ -23,9 +23,6 @@ module.exports = {
                     },
                     {
                         loader: "awesome-typescript-loader"
-                    },
-                    {
-                        loader: "tslint-loader"
                     }
                 ],
                 exclude: "/node_modules/"
