@@ -8,7 +8,8 @@ export const gameState: IGameState = {
         name: '',
         players: [],
         gameStatus: GameStatus.SETUP,
-        hostId: ''
+        hostId: '',
+        blackCard: null
     }
 }
 

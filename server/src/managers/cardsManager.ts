@@ -1,7 +1,9 @@
 import CardModel, { CardType } from '../models/CardModel';
 import { Game } from '../database/Game';
 import * as PlayerDatabase from '../database/Player';
+import * as GameDatabase from '../database/Game';
 import { PlayerModel } from 'src/models/PlayerModel';
+import { GameModel } from 'src/models/GameModel';
 
 const maxAllowedCardsPerPerson = 7;
 
@@ -18,6 +20,14 @@ export class CardsManager {
         
         return drawnCards;
     }
+
+    public static async DealGameBlackCard(gameId: string): Promise<GameModel> {
+        let game: GameModel = (await Game.findById(gameId));
+        
+        game.blackCard = generateBlackCard();
+        
+        return await GameDatabase.Game.update(game);        
+    }
 }
 
 
@@ -28,6 +38,7 @@ function generateWhiteCard(): CardModel {
     const adverbs: string[] = ["slowly", "elegantly", "precisely", "quickly", "sadly", "humbly", "proudly", "shockingly", "calmly", "passionately"];
 
     const card: CardModel = {
+        id: generateCardId(),
         type: CardType.White,
         text: adjectives[Math.floor(Math.random() * 10)] + " " + nouns[Math.floor(Math.random() * 10)] + " " + adverbs[Math.floor(Math.random() * 10)] + " " + verbs[Math.floor(Math.random() * 10)] + "."
     }
@@ -53,8 +64,19 @@ function generateBlackCard(): CardModel {
     const requiredAnswersCount = text.split(" ").filter((x) => { return x === "__"; }).length;
 
     return {
+        id: generateCardId(),
         type: CardType.Black,
         text: text,
         requiredAnswers: (requiredAnswersCount === 0) ? 1 : requiredAnswersCount
     };
+}
+
+function generateCardId(): string{
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
 }

@@ -5,6 +5,7 @@ import { PlayerModel } from "src/models/PlayerModel";
 import { PlayerDTO } from "../dtoModels/playerDTO";
 import { GameDTO } from "../dtoModels/gameDTO";
 import CardDTO from "../dtoModels/cardDTO";
+import CardModel from "src/models/CardModel";
 
 export class GameSocketActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
@@ -26,10 +27,15 @@ export class GameSocketActions {
         socketServer.to(game._id).emit("GAME_STARTED", gameDto);
     }
 
-    static emitPlayerGivenCard(player: PlayerModel, card: CardDTO, socketServer: Server){
+    static emitPlayerGivenCard(player: PlayerModel, card: CardModel, socketServer: Server){
         const cardDto: CardDTO = plainToClass(CardDTO, card);
         const playerDto: PlayerDTO = plainToClass(PlayerDTO, player);
         socketServer.sockets.sockets[player.id].emit("PLAYER_RECIEVED_CARD", playerDto, cardDto);
+    }
+
+    static emitGameGivenBlackCard(gameId: string, card: CardModel, socketServer: Server){
+        const cardDto: CardDTO = plainToClass(CardDTO, card);
+        socketServer.to(gameId).emit("GAME_DEALT_BLACK_CARD", card);
     }
 }
 

@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {Type} from "class-transformer";
+import {Type, Exclude, Expose} from "class-transformer";
 
 import { PlayerDTO } from "./playerDTO"
 
@@ -9,11 +9,12 @@ export enum GameStatus {
     ENDED
 }
 
+@Exclude()
 export class GameDTO {
-    name: string = ''
-    gameStatus: GameStatus
-    hostId: string
-    _id: string = ''
-    @Type(() => PlayerDTO)
-    players: PlayerDTO[] = []
+    @Expose() name: string = ''
+    @Expose() gameStatus: GameStatus
+    @Expose() hostId: string
+    @Expose() _id: string = ''    
+    @Expose() @Type(() => PlayerDTO)
+    @Expose() players: PlayerDTO[] = []
 }

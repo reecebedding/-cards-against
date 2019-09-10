@@ -25,13 +25,18 @@ export class GameManager {
         //Only allow the game to be started by the host
         if(game.hostId === socket.id)
         {
-            for(const player of game.players) {
+            const gameDealtBlackCard: GameModel = await CardsManager.DealGameBlackCard(gameId);
+            GameSocketActions.emitGameGivenBlackCard(game._id, gameDealtBlackCard.blackCard, socketServer);
+
+            for(const player of gameDealtBlackCard.players) {
                 const cardsDealt: CardModel[] = await CardsManager.DealPlayerWhiteCards(player.id, gameId);
                 cardsDealt.forEach(card => GameSocketActions.emitPlayerGivenCard(player, card, socketServer));
             }
             
             const gameWithPlayers: GameModel = await Game.findById(gameId);
             gameWithPlayers.gameStatus = GameStatus.PLAYING;
+
+
             const updatedGame: GameModel = await Game.update(gameWithPlayers);
             
             GameSocketActions.emitGameStarted(updatedGame, socketServer);

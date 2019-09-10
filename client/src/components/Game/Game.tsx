@@ -38,10 +38,23 @@ export class Game extends React.Component<IProps> {
                         }
                     </ol>
                 </div>
-                {this.renderStartGame()}
+                {this.renderBlackCard()}
+                {this.renderStartGameButton()}
                 {this.renderPlayerCards()}
             </div>
         )
+    }
+
+    renderBlackCard(){
+        if (this.props.activeGame.blackCard) {
+            return (
+                <Card className="black-card">
+                    <CardBody>
+                        <CardTitle>{this.props.activeGame.blackCard.text}</CardTitle>
+                    </CardBody>
+                </Card>
+            );
+        }          
     }
 
     renderPlayerCards(){
@@ -60,7 +73,7 @@ export class Game extends React.Component<IProps> {
         )
     }
 
-    renderStartGame(){
+    renderStartGameButton(){
         if((this.props.socket.id === this.props.activeGame.hostId) && (this.props.activeGame.gameStatus === GameStatus.SETUP)){
             return (
                 <div>

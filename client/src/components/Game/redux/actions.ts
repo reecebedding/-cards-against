@@ -46,3 +46,10 @@ export interface IPlayerRecievedCard extends Action {
 export function playerRecievedCard (player: PlayerModel, card: CardModel): IPlayerRecievedCard {
     return { type: GameKeys.PLAYER_RECIEVED_CARD, player, card }
 }
+
+export interface IGameDealtBlackCard extends Action {
+    card: CardModel
+}
+export function gameDealtBlackCard (card: CardModel): IGameDealtBlackCard {
+    return { type: GameKeys.GAME_DEALT_BLACK_CARD, card }
+}

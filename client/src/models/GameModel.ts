@@ -1,4 +1,5 @@
 import { PlayerModel } from "./PlayerModel";
+import CardModel from "./CardModel";
 
 export enum GameStatus {
     SETUP,
@@ -10,6 +11,7 @@ export interface GameModel {
     _id: string,
     name: string,
     players: PlayerModel[],
-    gameStatus: GameStatus,
+    blackCard: CardModel
+    gameStatus: GameStatus
     hostId: string
 }

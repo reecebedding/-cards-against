@@ -67,6 +67,15 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
                 }
             }
 
+        case GameKeys.GAME_DEALT_BLACK_CARD:
+            return {
+                ...state,
+                activeGame: {
+                    ...state.activeGame,
+                    blackCard: action.card
+                }       
+            }
+
         default:
             return state;
     }
