@@ -46,7 +46,7 @@ export class Game extends React.Component<IProps> {
 
     renderPlayerCards(){
         return (
-            this.props.activeGame.players.filter(x => x.id === this.props.socket.id).map((player) => {
+            this.props.activeGame.players.filter(x => (x.id === this.props.socket.id) && x.cards).map((player) => {
                 return player.cards.map((card, index: number) => {
                     return (
                         <Card key={index}>

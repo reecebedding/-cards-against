@@ -57,7 +57,7 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
                             return {
                                 ...player,
                                 cards: [
-                                    ...player.cards,
+                                    ...player.cards || [],
                                     action.card
                                 ]
                             }
