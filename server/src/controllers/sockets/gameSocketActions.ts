@@ -6,10 +6,13 @@ import { PlayerDTO } from "../dtoModels/playerDTO";
 import { GameDTO } from "../dtoModels/gameDTO";
 import CardDTO from "../dtoModels/cardDTO";
 import CardModel from "src/models/CardModel";
+import { GameManager } from "../../../src/managers/gameManager";
 
 export class GameSocketActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
-        
+        socket.on('PLAY_CARD', async (gameId: string, cardId: string) => {
+            await GameManager.playCard(gameId, cardId, socket, socket_server);
+        }); 
     }
 
     static emitPlayerJoined(gameId: string, player: PlayerModel, socketServer: Server){
@@ -36,6 +39,10 @@ export class GameSocketActions {
     static emitGameGivenBlackCard(gameId: string, card: CardModel, socketServer: Server){
         const cardDto: CardDTO = plainToClass(CardDTO, card);
         socketServer.to(gameId).emit("GAME_DEALT_BLACK_CARD", card);
+    }
+
+    static emitPlayerChoseCard(gameId: string, player: PlayerModel, socketServer: Server){
+        socketServer.to(gameId).emit("PLAYER_CHOSE_CARD", player.id);
     }
 }
 

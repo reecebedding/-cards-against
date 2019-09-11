@@ -4,4 +4,5 @@ export class PlayerModel {
     id: string
     gameId: string
     cards: CardModel[]
+    playedCards: CardModel[]
 }

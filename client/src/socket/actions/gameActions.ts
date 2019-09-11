@@ -29,3 +29,7 @@ export function startGame(socket: SocketIOClient.Socket, game: GameModel, dispat
         callback(game);
     });
 }
+
+export function playCard(socket: SocketIOClient.Socket, gameId: string, cardId: String, dispatch: Dispatch<any>){
+    socket.emit('PLAY_CARD', gameId, cardId);
+}

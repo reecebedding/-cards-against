@@ -2,7 +2,7 @@ import { GameKeys } from './keys';
 import { Action, Dispatch } from 'redux';
 import { GameModel } from '../../../models/GameModel';
 import { PlayerModel } from '../../../models/PlayerModel';
-import * as lobbySocket from '../../../socket/actions/lobbyActions';
+import * as lobbySocket from '../../../socket/actions/gameActions';
 import CardModel from '../../../models/CardModel';
 
 export interface IJoinedGame extends Action {
@@ -52,4 +52,17 @@ export interface IGameDealtBlackCard extends Action {
 }
 export function gameDealtBlackCard (card: CardModel): IGameDealtBlackCard {
     return { type: GameKeys.GAME_DEALT_BLACK_CARD, card }
+}
+
+export interface IPlayerChoseCard extends Action {
+    playerId: string
+}
+export function playerChoseCard(playerId: string): IPlayerChoseCard {
+    return { type: GameKeys.PLAYER_CHOSE_CARD, playerId };
+}
+
+export function playCard(socket: SocketIOClient.Socket, gameId: string, cardId: String) {
+    return function(dispatch: Dispatch){
+        lobbySocket.playCard(socket, gameId, cardId, dispatch);
+    }
 }

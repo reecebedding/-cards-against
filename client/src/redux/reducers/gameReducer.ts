@@ -3,13 +3,15 @@ import * as actions from '../../components/Game/redux/actions'
 import { gameState } from '../store/initialStates';
 import { IGameState } from '../store/IStoreStates';
 import { PlayerModel } from '../../models/PlayerModel';
+import { CardType } from '../../models/CardModel';
 
 type GameActions = 
      actions.IJoinedGame
      & actions.IPlayerJoined
      & actions.IPlayerLeft
      & actions.IGameStarted
-     & actions.IPlayerRecievedCard;
+     & actions.IPlayerRecievedCard
+     & actions.IPlayerChoseCard;
 
 export default function lobbyReducer(state = gameState, action: GameActions): IGameState {
     switch (action.type) {
@@ -74,6 +76,24 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
                     ...state.activeGame,
                     blackCard: action.card
                 }       
+            }
+        case GameKeys.PLAYER_CHOSE_CARD:
+            return {
+                ...state,
+                activeGame: {
+                    ...state.activeGame,
+                    players: state.activeGame.players.map(player => {
+                        if (player.id === action.playerId){                            
+                            return {
+                                ...player,
+                                playedCards: player.playedCards ? player.playedCards +1 : 1
+                            };
+                        }
+                        else {
+                            return player;
+                        }
+                    })
+                }    
             }
 
         default:

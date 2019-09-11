@@ -4,3 +4,11 @@
     background-color: black;
     color: white;
 }
+
+.player-card-active {
+    background-color: $info
+}
+
+.player-card :hover {
+    background-color: $light
+}

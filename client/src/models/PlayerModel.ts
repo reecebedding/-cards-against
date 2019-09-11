@@ -2,5 +2,6 @@ import CardModel from "./CardModel";
 
 export interface PlayerModel {
     id: string,
-    cards: CardModel[]
+    cards: CardModel[],
+    playedCards: number
 }

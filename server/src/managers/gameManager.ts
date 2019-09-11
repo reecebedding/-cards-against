@@ -7,6 +7,7 @@ import { CardsManager } from "./cardsManager";
 import { LobbySocketActions } from "../controllers/sockets/lobbySocketActions";
 import { GameSocketActions } from "../controllers/sockets/gameSocketActions";
 import CardModel from "src/models/CardModel";
+import { GameValidator, CanPlayerPlayCardResult } from "./validators/gameValidator";
 
 export class GameManager {
     public static async createGame(newGame: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
@@ -47,11 +48,27 @@ export class GameManager {
         return game;
     }
 
+    public static async playCard(gameId: string, cardId: string, socket: SocketIO.Socket, socketServer: Server): Promise<void> {
+        const canPlay: CanPlayerPlayCardResult = await GameValidator.canPlayerPlayCard(gameId, socket.id, cardId);
+        switch (canPlay) {
+            case CanPlayerPlayCardResult.YES: 
+                const game = await Game.findById(gameId);
+                const player = game.players.find(player => player.id === socket.id);
+                player.playedCards.push(player.cards.find(card => card.id == cardId));
+                player.cards = player.cards.filter(card => card.id !== cardId);
+                Player.update(player);
+
+                GameSocketActions.emitPlayerChoseCard(gameId, player, socketServer);
+
+                break;
+        }
+    }
+
     public static async joinGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel> {
         const game = await Game.findById(gameId);
         const playerId = socket.id;
         if(!game.players.some(x => x.id === playerId)){
-            const player:PlayerModel = { id: playerId, gameId: gameId, cards: []};
+            const player:PlayerModel = { id: playerId, gameId: gameId, cards: [], playedCards: []};
             game.players.push(player);
 
             socket.join(game._id);    
@@ -76,7 +93,7 @@ export class GameManager {
                 console.log(`Game '${game.name} closed`)
                 LobbySocketActions.emitLobbyRemoved(game, socketServer);
             }else{
-                const player:PlayerModel = { id: userId, gameId: game._id, cards: []};
+                const player:PlayerModel = { id: userId, gameId: game._id, cards: [], playedCards: []};
                 game.players = game.players.filter((player) => player.id !== userId);
                 const updatedGame: GameModel = await Game.update(game);
 
