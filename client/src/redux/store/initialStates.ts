@@ -1,4 +1,4 @@
-import { IGameState, ILobbyState } from './IStoreStates'
+import { IGameState, ILobbyState, IChatState } from './IStoreStates'
 import * as gameStatus from '../../constants/gameStatusConstants';
 import { GameStatus } from '../../models/GameModel';
 
@@ -15,4 +15,8 @@ export const gameState: IGameState = {
 
 export const lobbyState: ILobbyState = {
     lobbies: []
+}
+
+export const chatState: IChatState = {
+    chatHistory: []
 }

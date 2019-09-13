@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { ConnectionActions } from "./connectionActions";
 import { LobbySocketActions } from "./lobbySocketActions";
 import { GameSocketActions } from "./gameSocketActions";
+import { ChatSocketActions } from "./chatSocketActions"
 
 export class SocketManager {
     static initListeners(socket_server: Server){
@@ -12,6 +13,7 @@ export class SocketManager {
             ConnectionActions.init(socket_server, socket);
             LobbySocketActions.init(socket_server, socket);
             GameSocketActions.init(socket_server, socket);
+            ChatSocketActions.init(socket_server, socket);
         });
     }
 }

@@ -1,0 +1,3 @@
+export const ChatKeys = {
+    RECIEVED_CHAT_MESSAGE: "RECIEVED_CHAT_MESSAGE"
+}

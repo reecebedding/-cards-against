@@ -10,6 +10,7 @@ import { startGame, playCard } from "./redux/actions";
 import Card from "reactstrap/lib/Card";
 import CardBody from "reactstrap/lib/CardBody";
 import CardTitle from "reactstrap/lib/CardTitle";
+import ChatBox from "../Shared/Chat/ChatBox";
 
 interface IProps {
     socket: SocketIOClient.Socket,
@@ -57,6 +58,10 @@ export class Game extends React.Component<IProps, IState> {
                 <h1>Game: {this.props.activeGame.name}</h1>
                 <h2>Status: {this.props.activeGame.gameStatus}</h2>
                 {this.renderPlayerList()}
+
+
+                <ChatBox socket={this.props.socket} scope="GAME">
+                </ChatBox>
 
                 {this.renderBlackCard()}
                 {this.renderStartGameButton()}

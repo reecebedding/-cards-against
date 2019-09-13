@@ -11,6 +11,7 @@ import { LobbyList } from './LobbyList';
 import { withRouter } from 'react-router-dom';
 import { History } from 'history';
 import { GameModel } from '../../models/GameModel';
+import ChatBox from '../Shared/Chat/ChatBox';
 
 interface IProps {
     socket: SocketIOClient.Socket,
@@ -95,6 +96,10 @@ class Lobby extends React.Component<IProps, IState> {
                     <LobbyList lobbies={this.props.lobbies} joinGame={this.joinGame} />
                 </div>
                 <Button color="primary" onClick={this.toggleShowNewGame}>New Game</Button>
+
+                <ChatBox socket={this.props.socket} scope="GLOBAL">
+                </ChatBox>
+
 
                 <Modal isOpen={this.state.showNewGame} backdrop="static">
                     <ModalHeader>New Game</ModalHeader>
