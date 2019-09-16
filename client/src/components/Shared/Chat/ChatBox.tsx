@@ -1,10 +1,9 @@
 import * as React from "react";
 import { ChatMessage } from "../../../models/chatMessage";
-import { Input, InputGroup, InputGroupAddon, Button } from "reactstrap";
+import { Input, InputGroup, InputGroupAddon, Button, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
 import { ThunkDispatch } from "redux-thunk";
 import { IChatState } from "../../../redux/store/IStoreStates";
 import { AnyAction, compose } from "redux";
-import { chatMessageRecieved } from "./redux/actions";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { sendChatMessage } from "../../../socket/actions/chatActions";
@@ -12,12 +11,15 @@ import { sendChatMessage } from "../../../socket/actions/chatActions";
 interface IProps {
     socket: SocketIOClient.Socket,
     chatHistory: ChatMessage[],
-    scope: string
-    sendMessage: (message: string) => void
+    defaultScope: string
+    availableScopes: string[]
+    sendMessage: (message: string, scope: string) => void
 }
 
 interface IState {
     currentMessage: string
+    currentScope: string,
+    splitButtonOpen: boolean
 }
 
 export class ChatBox extends React.Component<IProps, IState> {
@@ -27,7 +29,9 @@ export class ChatBox extends React.Component<IProps, IState> {
         super(props);
         this.chatBox = React.createRef<HTMLTextAreaElement>();
         this.state = {
-            currentMessage: ''
+            currentMessage: '',
+            currentScope: props.defaultScope,
+            splitButtonOpen: false
         }
     }
 
@@ -42,7 +46,7 @@ export class ChatBox extends React.Component<IProps, IState> {
 
     sendMessage = () => {
         if(this.state.currentMessage){
-            this.props.sendMessage(this.state.currentMessage);
+            this.props.sendMessage(this.state.currentMessage, this.state.currentScope);
             this.setState((prev) => ({
                 ...prev,
                 currentMessage: ''
@@ -56,16 +60,37 @@ export class ChatBox extends React.Component<IProps, IState> {
         }
     }
 
+    toggleSplit = () => {
+        this.setState({
+          splitButtonOpen: !this.state.splitButtonOpen
+        });
+    }
+
+    setScope = (scope: string) => () => {
+        this.setState({
+            currentScope: scope
+        })
+    }
+
     render(){
         return (
             <div className="form-group">                    
-                <textarea ref={chatBox => this.chatBox = chatBox} 
-                    className="form-control" rows={3} 
-                    readOnly 
+                <textarea 
+                    ref={chatBox => this.chatBox = chatBox} 
+                    className="form-control" 
+                    rows={3} 
+                    readOnly={true}
                     value={this.props.chatHistory.map(x => `[${x.scope}] ${x.date} ${x.sender} : ${x.message}`).join("\n")}
-                >
-                </textarea>
+                />
                 <InputGroup>
+                    <InputGroupButtonDropdown addonType="prepend" isOpen={this.state.splitButtonOpen} toggle={this.toggleSplit}>
+                        <DropdownToggle caret={true}>
+                        {this.state.currentScope}
+                        </DropdownToggle>
+                        <DropdownMenu>
+                        {this.props.availableScopes.map(scope => <DropdownItem key={scope} onClick={this.setScope(scope)}>{scope}</DropdownItem>)}
+                        </DropdownMenu>
+                    </InputGroupButtonDropdown>
                     <Input placeholder="Message..." value={this.state.currentMessage} onChange={this.handleCurrentMessageChange} onKeyDown={this.handleCurrentMessageKeyDown}/>
                     <InputGroupAddon addonType="append"><Button color="primary" onClick={this.sendMessage}>Send</Button></InputGroupAddon>
                 </InputGroup>
@@ -87,7 +112,7 @@ function mapStateToProps(state: any) {
 
 function mapDispatchToProps(dispatch: ThunkDispatch<IChatState, null, AnyAction>, props: IProps) {
     return {
-        sendMessage: (chatMessage: string) => sendChatMessage(props.socket, chatMessage, props.scope)
+        sendMessage: (chatMessage: string, scope: string) => sendChatMessage(props.socket, chatMessage, scope)
     };
 }
 

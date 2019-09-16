@@ -60,8 +60,7 @@ export class Game extends React.Component<IProps, IState> {
                 {this.renderPlayerList()}
 
 
-                <ChatBox socket={this.props.socket} scope="GAME">
-                </ChatBox>
+                <ChatBox socket={this.props.socket} defaultScope="Game" availableScopes={["Game","Global"]} />
 
                 {this.renderBlackCard()}
                 {this.renderStartGameButton()}

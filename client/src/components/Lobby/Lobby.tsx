@@ -97,10 +97,8 @@ class Lobby extends React.Component<IProps, IState> {
                 </div>
                 <Button color="primary" onClick={this.toggleShowNewGame}>New Game</Button>
 
-                <ChatBox socket={this.props.socket} scope="GLOBAL">
-                </ChatBox>
-
-
+                <ChatBox socket={this.props.socket} defaultScope="Global" availableScopes={["Global"]} />
+                
                 <Modal isOpen={this.state.showNewGame} backdrop="static">
                     <ModalHeader>New Game</ModalHeader>
                     <ModalBody>
