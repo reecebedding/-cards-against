@@ -10,7 +10,7 @@ export class ChatSocketActions {
             ChatManager.sendMessage(chatMessage, (<any>ChatScope)[scope], socket, socket_server)
         }); 
     }
-    static emitMessageRecieved(chatMessage: ChatMessageModel, gameId: string, socketServer: Server){
+    static emitMessageRecieved(chatMessage: ChatMessageModel, socketServer: Server){
         const chatMessageDto = plainToClass(ChatMessageDTO, chatMessage);
         chatMessageDto.scope = ChatScope[chatMessage.scope];
         switch (chatMessage.scope){
@@ -18,7 +18,7 @@ export class ChatSocketActions {
                 socketServer.emit("CHAT_MESSAGE_RECIEVED", chatMessageDto);
             break;
             case ChatScope.GAME:
-                socketServer.to(gameId).emit("CHAT_MESSAGE_RECIEVED", chatMessageDto);
+                socketServer.to(chatMessage.gameId).emit("CHAT_MESSAGE_RECIEVED", chatMessageDto);
             break;
         }
     }

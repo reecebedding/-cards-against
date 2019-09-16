@@ -2,20 +2,26 @@ import { ChatScope, ChatMessageModel } from "../models/ChatMessageModel";
 import { ChatSocketActions } from "../controllers/sockets/chatSocketActions";
 import { Player } from "../database/Player";
 import { Server } from "socket.io";
+import { ChatValidator, CanPlayerSendMessageResult } from "./validators/chatValidator";
+import { GameModel } from "src/models/GameModel";
 
 export class ChatManager {
     public static async sendMessage(chatMessage: string, scope: ChatScope, socket: SocketIO.Socket, socketServer: Server){
-        let gameId: string = null;
+        let game: GameModel = null;
         if (scope === ChatScope.GAME){
-            const game = await Player.findGames(socket.id);
-            gameId = (game) ? game[0]._id : null;
+            const games = await Player.findGames(socket.id);
+            game = games ? games[0] : null;            
         }
+        
         const fullMessage: ChatMessageModel = {
             date: Date.now(),
             message: chatMessage,
             sender: socket.id,
-            scope: scope
+            scope: scope,
+            gameId: (game) ? game._id : null
         };
-        ChatSocketActions.emitMessageRecieved(fullMessage, gameId, socketServer);
+        if(await ChatValidator.canPlayerSendMessage(fullMessage) === CanPlayerSendMessageResult.YES){
+            ChatSocketActions.emitMessageRecieved(fullMessage, socketServer);
+        }
     }
 }

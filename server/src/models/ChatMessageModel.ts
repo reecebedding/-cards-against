@@ -8,4 +8,5 @@ export class ChatMessageModel {
     sender: string = ''
     message: string = ''
     scope: ChatScope
+    gameId: string = null
 }
