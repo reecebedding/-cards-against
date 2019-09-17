@@ -2,7 +2,7 @@ import { GameModel, RoundStatus } from "../../models/GameModel";
 import { Game } from "../../database/Game";
 
 export enum CanPlayerPlayCardResult {
-    "YES", "NOT_PLAYERS_CARD", "NOT_TIME_TO_PICK"
+    "YES", "NOT_PLAYERS_CARD", "NOT_TIME_TO_PICK", "PLAYER_IS_CZAR"
  }
 
 export class GameValidator {
@@ -19,6 +19,9 @@ export class GameValidator {
         }
         else if(gameModel.roundStatus !== RoundStatus.PLAYER_SELECT){
             return CanPlayerPlayCardResult.NOT_TIME_TO_PICK;
+        }
+        else if(gameModel.czarId === userId){
+            return CanPlayerPlayCardResult.PLAYER_IS_CZAR;
         }
         else {
             return CanPlayerPlayCardResult.YES;

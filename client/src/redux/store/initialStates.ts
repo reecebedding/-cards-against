@@ -9,6 +9,7 @@ export const gameState: IGameState = {
         players: [],
         gameStatus: GameStatus.SETUP,
         hostId: '',
+        czarId: '',
         roundStatus: RoundStatus.PLAYER_SELECT, 
         blackCard: null
     }

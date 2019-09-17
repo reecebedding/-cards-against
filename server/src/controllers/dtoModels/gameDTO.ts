@@ -14,6 +14,7 @@ export class GameDTO {
     @Expose() name: string = ''
     @Expose() gameStatus: GameStatus
     @Expose() hostId: string
+    @Expose() czarId: string
     @Expose() _id: string = ''    
     @Expose() @Type(() => PlayerDTO)
     @Expose() players: PlayerDTO[] = []

@@ -12,16 +12,21 @@ import { ChosenCardModel } from "../models/ChosenCardModel";
 import { plainToClass } from "class-transformer";
 
 export class GameManager {
-    public static async createGame(newGame: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
-        newGame._id = createGameID();
-        newGame.hostId = socket.id;
-        newGame.gameStatus = GameStatus.SETUP;
-        newGame.roundStatus = RoundStatus.PLAYER_SELECT;
+    public static async createGame(game: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
+        
+        const newGame: GameModel = {
+            ...game,
+            _id: createGameID(),
+            hostId: socket.id,
+            czarId: socket.id,
+            gameStatus: GameStatus.SETUP,
+            roundStatus: RoundStatus.PLAYER_SELECT
+        }
 
-        const game = await Game.create(newGame);
-        console.log(`Game '${newGame.name}' created`);
+        const savedGame = await Game.create(newGame);
+        console.log(`Game '${savedGame.name}' created`);
 
-        return game;
+        return savedGame;
     }
 
     public static async startGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel>{
@@ -53,7 +58,7 @@ export class GameManager {
 
     public static async determineRoundStatus(gameId: string): Promise<RoundStatus> {
         const game = await Game.findById(gameId);
-        const playersStillToPlayWhiteCard = (game.blackCard) ? game.players.filter(x => x.playedCards.length < game.blackCard.requiredAnswers) : [];
+        const playersStillToPlayWhiteCard = (game.blackCard) ? game.players.filter(x => (x.id !== game.czarId) && (x.playedCards.length < game.blackCard.requiredAnswers)) : [];
 
         if(game.blackCard && playersStillToPlayWhiteCard.length === 0)
         {

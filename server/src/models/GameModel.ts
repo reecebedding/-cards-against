@@ -17,6 +17,7 @@ export class GameModel {
     gameStatus: GameStatus
     roundStatus: RoundStatus
     hostId: string
+    czarId: string
     _id: string = ''
     blackCard: CardModel
     players: PlayerModel[] = []

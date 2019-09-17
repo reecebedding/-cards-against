@@ -42,7 +42,7 @@ export class Game extends React.Component<IProps, IState> {
 
     playCard = (cardId: string) => () => {
 
-        if (this.props.activeGame.roundStatus == RoundStatus.PLAYER_SELECT){
+        if ((this.props.activeGame.roundStatus == RoundStatus.PLAYER_SELECT) && (this.props.activeGame.czarId !== this.props.socket.id)){
             this.setState((prevState) => {
                 let cards = prevState.playedCards;
                 if (!cards.find(x => x.card.id === cardId)){
@@ -104,9 +104,10 @@ export class Game extends React.Component<IProps, IState> {
                         this.props.activeGame.players.map((player, index: number) => {
                             const userPlayedCards =  ((this.props.activeGame.blackCard) && (player.playedCards === this.props.activeGame.blackCard.requiredAnswers)) ? "✔" : "";
                             const userHost = (player.id === this.props.activeGame.hostId) ? " - HOST": "";
+                            const userCzar = (player.id === this.props.activeGame.czarId)? " - CZAR": "";
                             return (
                                 <li key={index}>
-                                    {userPlayedCards} {player.id} {userHost}
+                                    {userPlayedCards} {player.id} {userHost} {userCzar}
                                 </li>
                             );
                         })
@@ -133,7 +134,8 @@ export class Game extends React.Component<IProps, IState> {
             this.props.activeGame.players.filter(x => (x.id === this.props.socket.id) && x.cards).map((player) => {
                 return player.cards.map((card, index: number) => {
                     const isCardPlayed = this.state.playedCards.find(playedCard => playedCard.card.id === card.id);
-                    const cardClass = classNames({"player-card-active": isCardPlayed, "player-card": !isCardPlayed});
+                    const cardClass = (player.id !== this.props.activeGame.czarId) ? classNames({"player-card-active": isCardPlayed, "player-card": !isCardPlayed}) : "disabled-card";
+                    
                     return (
                         <Card key={index} onClick={this.playCard(card.id)} className={cardClass}>
                             <CardBody>

@@ -19,5 +19,6 @@ export interface GameModel {
     blackCard: CardModel
     gameStatus: GameStatus,
     roundStatus: RoundStatus,
-    hostId: string
+    hostId: string,
+    czarId: string
 }
