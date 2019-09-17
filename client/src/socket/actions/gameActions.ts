@@ -3,6 +3,7 @@ import { Dispatch } from "redux";
 import { loadLobbies } from "../../components/Lobby/redux/actions";
 import { joinedGame, gameStarted } from "../../components/Game/redux/actions";
 import { GameModel } from "../../models/GameModel";
+import { ChosenCardModel } from "../../models/ChosenCardModel";
 
 export function createNewGame(socket: SocketIOClient.Socket, game: LobbyModel, created: (game: GameModel) => any) {
     socket.emit('CREATE_NEW_GAME', game, (game: GameModel) =>{
@@ -30,6 +31,6 @@ export function startGame(socket: SocketIOClient.Socket, game: GameModel, dispat
     });
 }
 
-export function playCard(socket: SocketIOClient.Socket, gameId: string, cardId: String, dispatch: Dispatch<any>){
-    socket.emit('PLAY_CARD', gameId, cardId);
+export function playCards(socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[], dispatch: Dispatch<any>){
+    socket.emit('PLAY_CARDS', gameId, cardIds);
 }

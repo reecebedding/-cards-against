@@ -6,6 +6,6 @@ export enum CardType {
 export default class CardModel {
     id: string
     type?: CardType = CardType.White
-    requiredAnswers?: Number = 1
+    requiredAnswers?: number
     text: string = ''
 }

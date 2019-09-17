@@ -7,11 +7,12 @@ import { GameDTO } from "../dtoModels/gameDTO";
 import CardDTO from "../dtoModels/cardDTO";
 import CardModel from "src/models/CardModel";
 import { GameManager } from "../../../src/managers/gameManager";
+import { ChosenCardModel } from "src/models/ChosenCardModel";
 
 export class GameSocketActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
-        socket.on('PLAY_CARD', async (gameId: string, cardId: string) => {
-            await GameManager.playCard(gameId, cardId, socket, socket_server);
+        socket.on('PLAY_CARDS', async (gameId: string, cardIds: ChosenCardModel[]) => {
+            await GameManager.playCards(gameId, cardIds, socket, socket_server);
         }); 
     }
 
@@ -38,11 +39,11 @@ export class GameSocketActions {
 
     static emitGameGivenBlackCard(gameId: string, card: CardModel, socketServer: Server){
         const cardDto: CardDTO = plainToClass(CardDTO, card);
-        socketServer.to(gameId).emit("GAME_DEALT_BLACK_CARD", card);
+        socketServer.to(gameId).emit("GAME_DEALT_BLACK_CARD", cardDto);
     }
 
-    static emitPlayerChoseCard(gameId: string, player: PlayerModel, socketServer: Server){
-        socketServer.to(gameId).emit("PLAYER_CHOSE_CARD", player.id);
+    static emitPlayerChoseCards(gameId: string, player: PlayerModel, socketServer: Server){
+        socketServer.to(gameId).emit("PLAYER_CHOSE_CARDS", player.id);
     }
 }
 

@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import { ChatMessage } from "../../models/chatMessage";
+import { ChatMessage } from "../../models/ChatMessage";
 import { chatMessageRecieved } from "../../components/Shared/Chat/redux/actions";
 
 

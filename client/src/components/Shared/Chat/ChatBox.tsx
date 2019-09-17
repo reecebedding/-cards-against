@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChatMessage } from "../../../models/chatMessage";
+import { ChatMessage } from "../../../models/ChatMessage";
 import { Input, InputGroup, InputGroupAddon, Button, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
 import { ThunkDispatch } from "redux-thunk";
 import { IChatState } from "../../../redux/store/IStoreStates";

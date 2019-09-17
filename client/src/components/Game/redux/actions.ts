@@ -4,6 +4,7 @@ import { GameModel } from '../../../models/GameModel';
 import { PlayerModel } from '../../../models/PlayerModel';
 import * as lobbySocket from '../../../socket/actions/gameActions';
 import CardModel from '../../../models/CardModel';
+import { ChosenCardModel } from '../../../models/ChosenCardModel';
 
 export interface IJoinedGame extends Action {
     game: GameModel
@@ -54,15 +55,15 @@ export function gameDealtBlackCard (card: CardModel): IGameDealtBlackCard {
     return { type: GameKeys.GAME_DEALT_BLACK_CARD, card }
 }
 
-export interface IPlayerChoseCard extends Action {
+export interface IPlayerChoseCards extends Action {
     playerId: string
 }
-export function playerChoseCard(playerId: string): IPlayerChoseCard {
-    return { type: GameKeys.PLAYER_CHOSE_CARD, playerId };
+export function playerChoseCards(playerId: string): IPlayerChoseCards {
+    return { type: GameKeys.PLAYER_CHOSE_CARDS, playerId };
 }
 
-export function playCard(socket: SocketIOClient.Socket, gameId: string, cardId: String) {
+export function playCards(socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) {
     return function(dispatch: Dispatch){
-        lobbySocket.playCard(socket, gameId, cardId, dispatch);
+        lobbySocket.playCards(socket, gameId, cardIds, dispatch);
     }
 }

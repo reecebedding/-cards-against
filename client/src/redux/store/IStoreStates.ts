@@ -1,6 +1,6 @@
 import { LobbyModel } from "../../models/LobbyModel";
 import { GameModel } from "../../models/GameModel";
-import { ChatMessage } from "../../models/chatMessage";
+import { ChatMessage } from "../../models/ChatMessage";
 
 export interface IGameState {
     activeGame: GameModel

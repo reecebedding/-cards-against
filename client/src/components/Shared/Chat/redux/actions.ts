@@ -1,5 +1,5 @@
 import { Action, Dispatch } from "redux";
-import { ChatMessage } from "../../../../models/chatMessage";
+import { ChatMessage } from "../../../../models/ChatMessage";
 import * as chatSocket from '../../../../socket/actions/chatActions';
 import { ChatKeys } from "./keys";
 

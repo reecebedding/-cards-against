@@ -6,21 +6,22 @@ import { AnyAction } from "redux";
 import { IGameState } from "../../redux/store/IStoreStates";
 import { GameModel, GameStatus } from "../../models/GameModel";
 import Button from "reactstrap/lib/Button";
-import { startGame, playCard } from "./redux/actions";
+import { startGame, playCards } from "./redux/actions";
 import Card from "reactstrap/lib/Card";
 import CardBody from "reactstrap/lib/CardBody";
 import CardTitle from "reactstrap/lib/CardTitle";
 import ChatBox from "../Shared/Chat/ChatBox";
+import { ChosenCardModel } from "../../models/ChosenCardModel";
 
 interface IProps {
     socket: SocketIOClient.Socket,
     startGame: (socket: SocketIOClient.Socket, game: GameModel, started: (game: GameModel) => void) => void,
-    playCard: (socket: SocketIOClient.Socket, gameId: string, cardId: string) => void,
+    playCards: (socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) => void,
     activeGame: GameModel
 }
 
 interface IState {
-    playedCards: string[]
+    playedCards: ChosenCardModel[]
 }
 
 export class Game extends React.Component<IProps, IState> {
@@ -40,16 +41,39 @@ export class Game extends React.Component<IProps, IState> {
     }
 
     playCard = (cardId: string) => () => {
-        if (this.state.playedCards.length !== this.props.activeGame.blackCard.requiredAnswers) {
-            this.props.playCard(this.props.socket, this.props.activeGame._id, cardId);
-            this.setState((state) => ({
-                ...state,
-                playedCards: [
-                    ...this.state.playedCards,
-                    cardId
-                ]
-            }))
-        }
+
+        this.setState((prevState) => {
+            let cards = prevState.playedCards;
+            if (!cards.find(x => x.card.id === cardId)){
+                if (cards.length === this.props.activeGame.blackCard.requiredAnswers){
+                    cards.shift();
+                    cards = cards.map((card) => {
+                        return {
+                            ...card,
+                            position: card.position -1
+                        }
+                    });
+                }   
+
+                return {
+                    ...prevState,
+                    playedCards: [
+                        ...cards,
+                        {
+                            card: {
+                                id: cardId,
+                                text: '',
+                            },
+                            position: cards.length
+                        }
+                    ]
+                }
+            }  
+        }, () => {
+            if (this.state.playedCards.length >= this.props.activeGame.blackCard.requiredAnswers) {
+                this.props.playCards(this.props.socket, this.props.activeGame._id, this.state.playedCards); 
+            }
+        });    
     }
 
     render(){
@@ -106,12 +130,12 @@ export class Game extends React.Component<IProps, IState> {
         return (
             this.props.activeGame.players.filter(x => (x.id === this.props.socket.id) && x.cards).map((player) => {
                 return player.cards.map((card, index: number) => {
-                    const isCardPlayed = this.state.playedCards.find(cardId => cardId === card.id);
+                    const isCardPlayed = this.state.playedCards.find(playedCard => playedCard.card.id === card.id);
                     const cardClass = classNames({"player-card-active": isCardPlayed, "player-card": !isCardPlayed});
                     return (
                         <Card key={index} onClick={this.playCard(card.id)} className={cardClass}>
                             <CardBody>
-                                <CardTitle>{card.text}</CardTitle>
+                                <CardTitle>{this.state.playedCards.findIndex(x => x.card.id === card.id) >= 0 ? this.state.playedCards.findIndex(x => x.card.id === card.id)+1 + ' - ': ''} {card.text}</CardTitle>
                             </CardBody>
                         </Card>
                     )
@@ -141,7 +165,7 @@ function mapStateToProps(state: any) {
 function mapDispatchToProps(dispatch: ThunkDispatch<IGameState, null, AnyAction>) {
     return {
         startGame: (socket: SocketIOClient.Socket, game: GameModel, started: (game: GameModel) => void) => dispatch(startGame(socket, game, started)),
-        playCard: (socket: SocketIOClient.Socket, gameId: string, cardId: String) => dispatch(playCard(socket, gameId, cardId))
+        playCards: (socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) => dispatch(playCards(socket, gameId, cardIds))
     };
 }
 

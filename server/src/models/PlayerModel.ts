@@ -1,8 +1,9 @@
 import CardModel from "./CardModel"
+import { ChosenCardModel } from "./ChosenCardModel"
 
 export class PlayerModel {
     id: string
     gameId: string
     cards: CardModel[]
-    playedCards: CardModel[]
+    playedCards: ChosenCardModel[]
 }

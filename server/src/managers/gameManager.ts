@@ -6,8 +6,10 @@ import { PlayerModel } from "src/models/PlayerModel";
 import { CardsManager } from "./cardsManager";
 import { LobbySocketActions } from "../controllers/sockets/lobbySocketActions";
 import { GameSocketActions } from "../controllers/sockets/gameSocketActions";
-import CardModel from "src/models/CardModel";
+import CardModel from "../models/CardModel";
 import { GameValidator, CanPlayerPlayCardResult } from "./validators/gameValidator";
+import { ChosenCardModel } from "../models/ChosenCardModel";
+import { plainToClass } from "class-transformer";
 
 export class GameManager {
     public static async createGame(newGame: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
@@ -48,20 +50,28 @@ export class GameManager {
         return game;
     }
 
-    public static async playCard(gameId: string, cardId: string, socket: SocketIO.Socket, socketServer: Server): Promise<void> {
-        const canPlay: CanPlayerPlayCardResult = await GameValidator.canPlayerPlayCard(gameId, socket.id, cardId);
-        switch (canPlay) {
-            case CanPlayerPlayCardResult.YES: 
-                const game = await Game.findById(gameId);
-                const player = game.players.find(player => player.id === socket.id);
-                player.playedCards.push(player.cards.find(card => card.id == cardId));
-                player.cards = player.cards.filter(card => card.id !== cardId);
-                Player.update(player);
+    public static async playCards(gameId: string, cardIds: ChosenCardModel[], socket: SocketIO.Socket, socketServer: Server): Promise<void> {
+        const canPlay: boolean = (await Promise.all(cardIds.map(card => GameValidator.canPlayerPlayCard(gameId, socket.id, card.card.id)))).every(x => x === CanPlayerPlayCardResult.YES);
 
-                GameSocketActions.emitPlayerChoseCard(gameId, player, socketServer);
+        const game = await Game.findById(gameId);
+        const player = game.players.find(player => player.id === socket.id);
+        //Incase more ID's were injected, only grab the required amount
+        const allowedCards = cardIds.length > game.blackCard.requiredAnswers ? cardIds.splice(0, game.blackCard.requiredAnswers) : cardIds;
 
-                break;
-        }
+
+        const allCards = player.cards.concat(plainToClass(CardModel, player.playedCards.map(x => x.card)));
+
+        player.playedCards = allCards.filter(card => allowedCards.map(x => x.card.id).includes(card.id)).map(card => {
+            const position = cardIds.find(x => x.card.id == card.id).position;
+            const chosenCard = new ChosenCardModel();
+            chosenCard.card = card;
+            chosenCard.position = position;
+            return chosenCard;
+        });
+        player.cards = allCards.filter(card => !allowedCards.map(x => x.card.id).includes(card.id));
+        Player.update(player);
+
+        GameSocketActions.emitPlayerChoseCards(gameId, player, socketServer);
     }
 
     public static async joinGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel> {
