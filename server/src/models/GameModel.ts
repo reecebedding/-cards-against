@@ -7,9 +7,15 @@ export enum GameStatus {
     ENDED
 }
 
+export enum RoundStatus {
+    PLAYER_SELECT,
+    CZAR_SELECT
+}
+
 export class GameModel {
     name: string = ''
     gameStatus: GameStatus
+    roundStatus: RoundStatus
     hostId: string
     _id: string = ''
     blackCard: CardModel

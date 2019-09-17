@@ -1,6 +1,6 @@
 import { GameKeys } from './keys';
 import { Action, Dispatch } from 'redux';
-import { GameModel } from '../../../models/GameModel';
+import { GameModel, RoundStatus } from '../../../models/GameModel';
 import { PlayerModel } from '../../../models/PlayerModel';
 import * as lobbySocket from '../../../socket/actions/gameActions';
 import CardModel from '../../../models/CardModel';
@@ -60,6 +60,13 @@ export interface IPlayerChoseCards extends Action {
 }
 export function playerChoseCards(playerId: string): IPlayerChoseCards {
     return { type: GameKeys.PLAYER_CHOSE_CARDS, playerId };
+}
+
+export interface IRoundStatusChanged extends Action { 
+    roundStatus: RoundStatus
+}
+export function roundStatusChanged(roundStatus: RoundStatus): IRoundStatusChanged {
+    return { type: GameKeys.ROUND_STATUS_CHANGED, roundStatus }
 }
 
 export function playCards(socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) {

@@ -1,4 +1,4 @@
-import { GameModel, GameStatus } from "../models/GameModel";
+import { GameModel, GameStatus, RoundStatus } from "../models/GameModel";
 import { Game } from "../database/Game";
 import { Player } from "../database/Player";
 import { Server } from "socket.io";
@@ -16,6 +16,7 @@ export class GameManager {
         newGame._id = createGameID();
         newGame.hostId = socket.id;
         newGame.gameStatus = GameStatus.SETUP;
+        newGame.roundStatus = RoundStatus.PLAYER_SELECT;
 
         const game = await Game.create(newGame);
         console.log(`Game '${newGame.name}' created`);
@@ -26,7 +27,7 @@ export class GameManager {
     public static async startGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel>{
         const game: GameModel = await Game.findById(gameId);
         //Only allow the game to be started by the host
-        if(game.hostId === socket.id)
+        if(game.hostId === socket.id && game.gameStatus === GameStatus.SETUP)
         {
             const gameDealtBlackCard: GameModel = await CardsManager.DealGameBlackCard(gameId);
             GameSocketActions.emitGameGivenBlackCard(game._id, gameDealtBlackCard.blackCard, socketServer);
@@ -50,28 +51,45 @@ export class GameManager {
         return game;
     }
 
-    public static async playCards(gameId: string, cardIds: ChosenCardModel[], socket: SocketIO.Socket, socketServer: Server): Promise<void> {
-        const canPlay: boolean = (await Promise.all(cardIds.map(card => GameValidator.canPlayerPlayCard(gameId, socket.id, card.card.id)))).every(x => x === CanPlayerPlayCardResult.YES);
-
+    public static async determineRoundStatus(gameId: string): Promise<RoundStatus> {
         const game = await Game.findById(gameId);
-        const player = game.players.find(player => player.id === socket.id);
-        //Incase more ID's were injected, only grab the required amount
-        const allowedCards = cardIds.length > game.blackCard.requiredAnswers ? cardIds.splice(0, game.blackCard.requiredAnswers) : cardIds;
+        const playersStillToPlayWhiteCard = (game.blackCard) ? game.players.filter(x => x.playedCards.length < game.blackCard.requiredAnswers) : [];
 
+        if(game.blackCard && playersStillToPlayWhiteCard.length === 0)
+        {
+            return RoundStatus.CZAR_SELECT;
+        } else {
+            return RoundStatus.PLAYER_SELECT;
+        }
 
-        const allCards = player.cards.concat(plainToClass(CardModel, player.playedCards.map(x => x.card)));
+    }
 
-        player.playedCards = allCards.filter(card => allowedCards.map(x => x.card.id).includes(card.id)).map(card => {
-            const position = cardIds.find(x => x.card.id == card.id).position;
-            const chosenCard = new ChosenCardModel();
-            chosenCard.card = card;
-            chosenCard.position = position;
-            return chosenCard;
-        });
-        player.cards = allCards.filter(card => !allowedCards.map(x => x.card.id).includes(card.id));
-        Player.update(player);
+    public static async playCards(gameId: string, cardIds: ChosenCardModel[], socket: SocketIO.Socket, socketServer: Server): Promise<void> {
+        const canPlayAllCards: boolean = (await Promise.all(cardIds.map(card => GameValidator.canPlayerPlayCard(gameId, socket.id, card.card.id)))).every(x => x === CanPlayerPlayCardResult.YES);
 
-        GameSocketActions.emitPlayerChoseCards(gameId, player, socketServer);
+        if (canPlayAllCards){
+            const game = await Game.findById(gameId);
+            const player = game.players.find(player => player.id === socket.id);
+            //Incase more ID's were injected, only grab the required amount
+            const allowedCards = cardIds.length > game.blackCard.requiredAnswers ? cardIds.splice(0, game.blackCard.requiredAnswers) : cardIds;
+    
+            const allPlayersCards = player.cards.concat(plainToClass(CardModel, player.playedCards.map(x => x.card)));
+    
+            player.playedCards = allPlayersCards.filter(card => allowedCards.map(x => x.card.id).includes(card.id)).map(card => {
+                return {
+                    card: card,
+                    position: cardIds.find(x => x.card.id == card.id).position
+                }
+            });
+            player.cards = allPlayersCards.filter(card => !allowedCards.map(x => x.card.id).includes(card.id));
+            Player.update(player);
+            GameSocketActions.emitPlayerChoseCards(gameId, player, socketServer);
+            
+            const roundStatus = await this.determineRoundStatus(gameId);
+            if(roundStatus !== game.roundStatus){
+                GameSocketActions.emitRoundStatusChanged(gameId, roundStatus, socketServer);
+            }
+        }
     }
 
     public static async joinGame(gameId: string, socket: SocketIO.Socket, socketServer: Server): Promise<GameModel> {
@@ -110,6 +128,11 @@ export class GameManager {
                 GameSocketActions.emitPlayerLeft(updatedGame._id, player, socketServer)                
                 LobbySocketActions.emitLobbyUpdated(updatedGame, socketServer);
                 
+                const roundStatus = await this.determineRoundStatus(game._id);
+                if (roundStatus !== game.roundStatus){
+                    GameSocketActions.emitRoundStatusChanged(game._id, roundStatus, socketServer);
+                }
+
                 return updatedGame;
             }
         })

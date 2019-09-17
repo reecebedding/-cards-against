@@ -1,6 +1,6 @@
 import { IGameState, ILobbyState, IChatState } from './IStoreStates'
 import * as gameStatus from '../../constants/gameStatusConstants';
-import { GameStatus } from '../../models/GameModel';
+import { GameStatus, RoundStatus } from '../../models/GameModel';
 
 export const gameState: IGameState = {
     activeGame: {
@@ -9,6 +9,7 @@ export const gameState: IGameState = {
         players: [],
         gameStatus: GameStatus.SETUP,
         hostId: '',
+        roundStatus: RoundStatus.PLAYER_SELECT, 
         blackCard: null
     }
 }

@@ -11,7 +11,8 @@ type GameActions =
      & actions.IPlayerLeft
      & actions.IGameStarted
      & actions.IPlayerRecievedCard
-     & actions.IPlayerChoseCards;
+     & actions.IPlayerChoseCards
+     & actions.IRoundStatusChanged;
 
 export default function lobbyReducer(state = gameState, action: GameActions): IGameState {
     switch (action.type) {
@@ -19,7 +20,10 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
         case GameKeys.JOINED_GAME:
             return {
                 ...state,
-                activeGame: action.game
+                activeGame: {
+                    ...state.activeGame,
+                    ...action.game
+                }
             };
         
         case GameKeys.PLAYER_JOINED:
@@ -94,6 +98,15 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
                         }
                     })
                 }    
+            }
+
+        case GameKeys.ROUND_STATUS_CHANGED:
+            return {
+                ...state,
+                activeGame: {
+                    ...state.activeGame,
+                    roundStatus: action.roundStatus
+                }
             }
 
         default:

@@ -1,8 +1,8 @@
-import { GameModel } from "../../models/GameModel";
+import { GameModel, RoundStatus } from "../../models/GameModel";
 import { Game } from "../../database/Game";
 
 export enum CanPlayerPlayCardResult {
-    "YES", "MAX_REQUIRED_CARDS", "NOT_PLAYERS_CARD"
+    "YES", "NOT_PLAYERS_CARD", "NOT_TIME_TO_PICK"
  }
 
 export class GameValidator {
@@ -17,8 +17,8 @@ export class GameValidator {
         if (!playersCard){
             return CanPlayerPlayCardResult.NOT_PLAYERS_CARD;
         }
-        else if (gameModel.blackCard.requiredAnswers === player.playedCards.length){
-            return CanPlayerPlayCardResult.MAX_REQUIRED_CARDS;
+        else if(gameModel.roundStatus !== RoundStatus.PLAYER_SELECT){
+            return CanPlayerPlayCardResult.NOT_TIME_TO_PICK;
         }
         else {
             return CanPlayerPlayCardResult.YES;

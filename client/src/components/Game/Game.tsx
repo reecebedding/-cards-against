@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { AnyAction } from "redux";
 import { IGameState } from "../../redux/store/IStoreStates";
-import { GameModel, GameStatus } from "../../models/GameModel";
+import { GameModel, GameStatus, RoundStatus } from "../../models/GameModel";
 import Button from "reactstrap/lib/Button";
 import { startGame, playCards } from "./redux/actions";
 import Card from "reactstrap/lib/Card";
@@ -42,38 +42,40 @@ export class Game extends React.Component<IProps, IState> {
 
     playCard = (cardId: string) => () => {
 
-        this.setState((prevState) => {
-            let cards = prevState.playedCards;
-            if (!cards.find(x => x.card.id === cardId)){
-                if (cards.length === this.props.activeGame.blackCard.requiredAnswers){
-                    cards.shift();
-                    cards = cards.map((card) => {
-                        return {
-                            ...card,
-                            position: card.position -1
-                        }
-                    });
-                }   
-
-                return {
-                    ...prevState,
-                    playedCards: [
-                        ...cards,
-                        {
-                            card: {
-                                id: cardId,
-                                text: '',
-                            },
-                            position: cards.length
-                        }
-                    ]
+        if (this.props.activeGame.roundStatus == RoundStatus.PLAYER_SELECT){
+            this.setState((prevState) => {
+                let cards = prevState.playedCards;
+                if (!cards.find(x => x.card.id === cardId)){
+                    if (cards.length === this.props.activeGame.blackCard.requiredAnswers){
+                        cards.shift();
+                        cards = cards.map((card) => {
+                            return {
+                                ...card,
+                                position: card.position -1
+                            }
+                        });
+                    }   
+    
+                    return {
+                        ...prevState,
+                        playedCards: [
+                            ...cards,
+                            {
+                                card: {
+                                    id: cardId,
+                                    text: '',
+                                },
+                                position: cards.length
+                            }
+                        ]
+                    }
+                }  
+            }, () => {
+                if (this.state.playedCards.length >= this.props.activeGame.blackCard.requiredAnswers) {
+                    this.props.playCards(this.props.socket, this.props.activeGame._id, this.state.playedCards); 
                 }
-            }  
-        }, () => {
-            if (this.state.playedCards.length >= this.props.activeGame.blackCard.requiredAnswers) {
-                this.props.playCards(this.props.socket, this.props.activeGame._id, this.state.playedCards); 
-            }
-        });    
+            });    
+        }
     }
 
     render(){

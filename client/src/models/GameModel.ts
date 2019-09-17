@@ -7,11 +7,17 @@ export enum GameStatus {
     ENDED
 }
 
+export enum RoundStatus {
+    PLAYER_SELECT,
+    CZAR_SELECT
+}
+
 export interface GameModel {
     _id: string,
     name: string,
     players: PlayerModel[],
     blackCard: CardModel
-    gameStatus: GameStatus
+    gameStatus: GameStatus,
+    roundStatus: RoundStatus,
     hostId: string
 }

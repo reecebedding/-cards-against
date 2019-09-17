@@ -1,4 +1,4 @@
-import { GameModel } from "../../models/GameModel";
+import { GameModel, RoundStatus } from "../../models/GameModel";
 import { Server } from "socket.io";
 import { plainToClass } from "class-transformer"
 import { PlayerModel } from "src/models/PlayerModel";
@@ -44,6 +44,10 @@ export class GameSocketActions {
 
     static emitPlayerChoseCards(gameId: string, player: PlayerModel, socketServer: Server){
         socketServer.to(gameId).emit("PLAYER_CHOSE_CARDS", player.id);
+    }
+
+    static emitRoundStatusChanged(gameId: string, roundStatus: RoundStatus, socketServer: Server){
+        socketServer.to(gameId).emit("ROUND_STATUS_CHANGED", roundStatus);
     }
 }
 
