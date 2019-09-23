@@ -80,17 +80,28 @@ export class Game extends React.Component<IProps, IState> {
 
     render(){
         return (
-            <div>
-                <h1>Game: {this.props.activeGame.name}</h1>
-                <h2>Status: {this.props.activeGame.gameStatus}</h2>
-                {this.renderPlayerList()}
-
-
-                <ChatBox socket={this.props.socket} defaultScope="Game" availableScopes={["Game","Global"]} />
-
-                {this.renderBlackCard()}
-                {this.renderStartGameButton()}
-                {this.renderPlayerCards()}
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col">
+                        <h1>Game: {this.props.activeGame.name}</h1>
+                        <h2>Game Status: {this.props.activeGame.gameStatus}</h2>
+                        <h2>Round Status: {this.props.activeGame.roundStatus}</h2>
+                        {this.renderPlayerList()}
+                        {this.renderStartGameButton()}
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <ChatBox socket={this.props.socket} defaultScope="Game" availableScopes={["Game","Global"]} />
+                    </div>                    
+                </div>
+                <div className="row">
+                    <div className="col">
+                        {this.renderBlackCard()}                    
+                        {this.renderPlayerCards()}
+                    </div>
+                </div>
+                
             </div>
         )
     }

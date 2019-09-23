@@ -56,17 +56,27 @@ export class GameManager {
         return game;
     }
 
-    public static async determineRoundStatus(gameId: string): Promise<RoundStatus> {
+    public static async checkRoundStatus(gameId: string, socketServer: Server): Promise<RoundStatus> {
         const game = await Game.findById(gameId);
         const playersStillToPlayWhiteCard = (game.blackCard) ? game.players.filter(x => (x.id !== game.czarId) && (x.playedCards.length < game.blackCard.requiredAnswers)) : [];
+        let determinedRoundStatus: RoundStatus = null;
 
-        if(game.blackCard && playersStillToPlayWhiteCard.length === 0)
-        {
-            return RoundStatus.CZAR_SELECT;
+        if(game.blackCard && playersStillToPlayWhiteCard.length === 0){
+            determinedRoundStatus = RoundStatus.CZAR_SELECT;
         } else {
-            return RoundStatus.PLAYER_SELECT;
+            determinedRoundStatus = RoundStatus.PLAYER_SELECT;
+        }
+        
+        if(determinedRoundStatus !== game.roundStatus){
+            const updatedGame: GameModel = {
+                ...game,
+                roundStatus: determinedRoundStatus
+            }
+            await Game.update(updatedGame);
+            GameSocketActions.emitRoundStatusChanged(gameId, determinedRoundStatus, socketServer);
         }
 
+        return determinedRoundStatus;
     }
 
     public static async playCards(gameId: string, cardIds: ChosenCardModel[], socket: SocketIO.Socket, socketServer: Server): Promise<void> {
@@ -90,10 +100,7 @@ export class GameManager {
             Player.update(player);
             GameSocketActions.emitPlayerChoseCards(gameId, player, socketServer);
             
-            const roundStatus = await this.determineRoundStatus(gameId);
-            if(roundStatus !== game.roundStatus){
-                GameSocketActions.emitRoundStatusChanged(gameId, roundStatus, socketServer);
-            }
+            this.checkRoundStatus(gameId, socketServer);
         }
     }
 
@@ -133,11 +140,7 @@ export class GameManager {
                 GameSocketActions.emitPlayerLeft(updatedGame._id, player, socketServer)                
                 LobbySocketActions.emitLobbyUpdated(updatedGame, socketServer);
                 
-                const roundStatus = await this.determineRoundStatus(game._id);
-                if (roundStatus !== game.roundStatus){
-                    GameSocketActions.emitRoundStatusChanged(game._id, roundStatus, socketServer);
-                }
-
+                this.checkRoundStatus(game._id, socketServer);
                 return updatedGame;
             }
         })
