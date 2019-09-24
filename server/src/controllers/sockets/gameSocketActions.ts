@@ -8,12 +8,18 @@ import CardDTO from "../dtoModels/cardDTO";
 import CardModel from "src/models/CardModel";
 import { GameManager } from "../../../src/managers/gameManager";
 import { ChosenCardModel } from "src/models/ChosenCardModel";
+import { RoundResult } from "src/models/RoundResult";
+import { RoundResultDTO } from "../dtoModels/roundResultDTO";
 
 export class GameSocketActions {
     static init(socket_server: Server, socket: SocketIO.Socket){
         socket.on('PLAY_CARDS', async (gameId: string, cardIds: ChosenCardModel[]) => {
             await GameManager.playCards(gameId, cardIds, socket, socket_server);
         }); 
+
+        socket.on('CZAR_PICKED_CARD', async (gameId: string, cardId: string) => {
+            await GameManager.czarPickedCard(gameId, cardId, socket, socket_server)
+        })
     }
 
     static emitPlayerJoined(gameId: string, player: PlayerModel, socketServer: Server){
@@ -48,6 +54,15 @@ export class GameSocketActions {
 
     static emitRoundStatusChanged(gameId: string, roundStatus: RoundStatus, socketServer: Server){
         socketServer.to(gameId).emit("ROUND_STATUS_CHANGED", roundStatus);
+    }
+
+    static emitCzarPickingCards(gameId: string, cards: ChosenCardModel[][], socketServer: Server){
+        socketServer.to(gameId).emit("CZAR_PICKING_CARDS", cards);
+    }
+
+    static emitRoundFinished(gameId: string, roundResult: RoundResult, socketServer: Server){
+        const roundResultDto: RoundResultDTO = plainToClass(RoundResultDTO, roundResult);
+        socketServer.to(gameId).emit("ROUND_FINISHED", roundResultDto);
     }
 }
 

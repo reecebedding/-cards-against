@@ -6,22 +6,25 @@ import { AnyAction } from "redux";
 import { IGameState } from "../../redux/store/IStoreStates";
 import { GameModel, GameStatus, RoundStatus } from "../../models/GameModel";
 import Button from "reactstrap/lib/Button";
-import { startGame, playCards } from "./redux/actions";
+import { startGame, playCards, czarPickedCard } from "./redux/actions";
 import Card from "reactstrap/lib/Card";
 import CardBody from "reactstrap/lib/CardBody";
 import CardTitle from "reactstrap/lib/CardTitle";
 import ChatBox from "../Shared/Chat/ChatBox";
 import { ChosenCardModel } from "../../models/ChosenCardModel";
+import { Modal, ModalHeader, ModalBody } from "reactstrap";
 
 interface IProps {
     socket: SocketIOClient.Socket,
     startGame: (socket: SocketIOClient.Socket, game: GameModel, started: (game: GameModel) => void) => void,
     playCards: (socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) => void,
+    czarPickedCard: (socket: SocketIOClient.Socket, gameId: string, cardId: string) => void,
     activeGame: GameModel
 }
 
 interface IState {
-    playedCards: ChosenCardModel[]
+    playedCards: ChosenCardModel[],
+    showRoundResult: () => boolean
 }
 
 export class Game extends React.Component<IProps, IState> {
@@ -30,7 +33,8 @@ export class Game extends React.Component<IProps, IState> {
         super(props);
 
         this.state = {
-            playedCards: []
+            playedCards: [],
+            showRoundResult: () => this.props.activeGame.roundResult !== null
         };
     }
 
@@ -78,6 +82,12 @@ export class Game extends React.Component<IProps, IState> {
         }
     }
 
+    czarPickCard = (cardId: string) => () => {
+        if((this.props.socket.id === this.props.activeGame.czarId)){
+            this.props.czarPickedCard(this.props.socket, this.props.activeGame._id, cardId);
+        }
+    }
+
     render(){
         return (
             <div className="container-fluid">
@@ -88,6 +98,9 @@ export class Game extends React.Component<IProps, IState> {
                         <h2>Round Status: {this.props.activeGame.roundStatus}</h2>
                         {this.renderPlayerList()}
                         {this.renderStartGameButton()}
+                    </div>
+                    <div className="col">
+                        {this.renderRoundsSelectedCards()}
                     </div>
                 </div>
                 <div className="row">
@@ -102,8 +115,39 @@ export class Game extends React.Component<IProps, IState> {
                     </div>
                 </div>
                 
+                {this.renderRoundResult()}
+
             </div>
         )
+    }
+
+    renderRoundResult(){
+        if(this.state.showRoundResult()){
+            return (
+                <Modal isOpen={this.state.showRoundResult()} backdrop="static">
+                    <ModalHeader>Winner: {this.props.activeGame.roundResult.winningPlayer.id}</ModalHeader>
+                    <ModalBody>
+                        <div>
+                            <div className="row">
+                                {       
+                                    this.props.activeGame.roundResult.winningCards.map((card: ChosenCardModel, index: number) => {
+                                        return (
+                                            <div className="col0" key={index}>
+                                                <Card className="player-card">
+                                                    <CardBody>
+                                                        <CardTitle>{card.card.text}</CardTitle>
+                                                    </CardBody>
+                                                </Card>
+                                            </div>                                           
+                                        )
+                                    })  
+                                }
+                            </div>
+                        </div>
+                    </ModalBody>
+                </Modal>
+            )
+        }
     }
 
     renderPlayerList(){
@@ -159,6 +203,32 @@ export class Game extends React.Component<IProps, IState> {
         )
     }
 
+    renderRoundsSelectedCards(){
+        if(this.props.activeGame.roundsSelectedCards.length > 0 && this.props.activeGame.roundStatus == RoundStatus.CZAR_SELECT){
+            return (
+                this.props.activeGame.roundsSelectedCards.map((cards: ChosenCardModel[], index: number) => {
+                    return (
+                        <div className="row" key={index}>
+                            {
+                                cards.map(card => {
+                                    return (
+                                        <div className="col" key={card.card.id}>
+                                            <Card className="player-card" onClick={this.czarPickCard(card.card.id)}>
+                                                <CardBody>
+                                                    <CardTitle>{card.card.text}</CardTitle>
+                                                </CardBody>
+                                            </Card>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                    )
+                })
+            )
+        }
+    }
+
     renderStartGameButton(){
         if((this.props.socket.id === this.props.activeGame.hostId) && (this.props.activeGame.gameStatus === GameStatus.SETUP)){
             return (
@@ -180,7 +250,8 @@ function mapStateToProps(state: any) {
 function mapDispatchToProps(dispatch: ThunkDispatch<IGameState, null, AnyAction>) {
     return {
         startGame: (socket: SocketIOClient.Socket, game: GameModel, started: (game: GameModel) => void) => dispatch(startGame(socket, game, started)),
-        playCards: (socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) => dispatch(playCards(socket, gameId, cardIds))
+        playCards: (socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) => dispatch(playCards(socket, gameId, cardIds)),
+        czarPickedCard: (socket: SocketIOClient.Socket, gameId: string, cardId: string) => dispatch(czarPickedCard(socket, gameId, cardId))
     };
 }
 

@@ -1,5 +1,7 @@
 import { PlayerModel } from "./PlayerModel";
 import CardModel from "./CardModel";
+import { ChosenCardModel } from "./ChosenCardModel";
+import RoundResult from "./RoundResult";
 
 export enum GameStatus {
     SETUP,
@@ -19,6 +21,8 @@ export interface GameModel {
     blackCard: CardModel
     gameStatus: GameStatus,
     roundStatus: RoundStatus,
+    roundsSelectedCards: ChosenCardModel[][],
     hostId: string,
-    czarId: string
+    czarId: string,
+    roundResult: RoundResult
 }

@@ -34,3 +34,7 @@ export function startGame(socket: SocketIOClient.Socket, game: GameModel, dispat
 export function playCards(socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[], dispatch: Dispatch<any>){
     socket.emit('PLAY_CARDS', gameId, cardIds);
 }
+
+export function czarPickedCard(socket: SocketIOClient.Socket, gameId: string, cardId: string){
+    socket.emit("CZAR_PICKED_CARD", gameId, cardId);
+}

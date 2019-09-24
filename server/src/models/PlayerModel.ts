@@ -6,4 +6,5 @@ export class PlayerModel {
     gameId: string
     cards: CardModel[]
     playedCards: ChosenCardModel[]
+    score: number = 0
 }

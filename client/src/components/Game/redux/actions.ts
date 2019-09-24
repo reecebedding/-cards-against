@@ -2,9 +2,10 @@ import { GameKeys } from './keys';
 import { Action, Dispatch } from 'redux';
 import { GameModel, RoundStatus } from '../../../models/GameModel';
 import { PlayerModel } from '../../../models/PlayerModel';
-import * as lobbySocket from '../../../socket/actions/gameActions';
+import * as gameSocket from '../../../socket/actions/gameActions';
 import CardModel from '../../../models/CardModel';
 import { ChosenCardModel } from '../../../models/ChosenCardModel';
+import RoundResult from '../../../models/RoundResult';
 
 export interface IJoinedGame extends Action {
     game: GameModel
@@ -29,7 +30,7 @@ export function playerLeft(player: PlayerModel): IPlayerLeft {
 
 export function startGame(socket: SocketIOClient.Socket, game: GameModel, started: (game: GameModel) => void) {
     return function(dispatch: Dispatch){
-        lobbySocket.startGame(socket, game, dispatch, started);
+        gameSocket.startGame(socket, game, dispatch, started);
     }
 }
 
@@ -71,6 +72,26 @@ export function roundStatusChanged(roundStatus: RoundStatus): IRoundStatusChange
 
 export function playCards(socket: SocketIOClient.Socket, gameId: string, cardIds: ChosenCardModel[]) {
     return function(dispatch: Dispatch){
-        lobbySocket.playCards(socket, gameId, cardIds, dispatch);
+        gameSocket.playCards(socket, gameId, cardIds, dispatch);
     }
+}
+
+export interface ICzarPickingCard extends Action {
+    roundsSelectedCards: ChosenCardModel[][]
+}
+export function czarPickingCard(roundsSelectedCards: ChosenCardModel[][]): ICzarPickingCard {
+    return { type: GameKeys.CZAR_PICKING_CARDS, roundsSelectedCards };
+}
+
+export function czarPickedCard(socket: SocketIOClient.Socket, gameId: string, cardId: string) {
+    return function(dispatch: Dispatch){
+        gameSocket.czarPickedCard(socket, gameId, cardId);
+    }
+}
+
+export interface IRoundFinished extends Action {
+    roundResult: RoundResult
+}
+export function roundFinished(roundResult: RoundResult): IRoundFinished {
+    return { type: GameKeys.ROUND_FINISHED, roundResult }
 }

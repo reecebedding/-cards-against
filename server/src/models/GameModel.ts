@@ -21,4 +21,5 @@ export class GameModel {
     _id: string = ''
     blackCard: CardModel
     players: PlayerModel[] = []
+    roundCount: number = 1
 }

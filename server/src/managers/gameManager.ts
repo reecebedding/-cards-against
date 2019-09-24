@@ -7,9 +7,10 @@ import { CardsManager } from "./cardsManager";
 import { LobbySocketActions } from "../controllers/sockets/lobbySocketActions";
 import { GameSocketActions } from "../controllers/sockets/gameSocketActions";
 import CardModel from "../models/CardModel";
-import { GameValidator, CanPlayerPlayCardResult } from "./validators/gameValidator";
+import { GameValidator, CanPlayerPlayCardResult, CanCzarPickCardResult } from "./validators/gameValidator";
 import { ChosenCardModel } from "../models/ChosenCardModel";
 import { plainToClass } from "class-transformer";
+import { RoundResult } from "src/models/RoundResult";
 
 export class GameManager {
     public static async createGame(game: GameModel, socket: SocketIO.Socket): Promise<GameModel> {
@@ -74,9 +75,28 @@ export class GameManager {
             }
             await Game.update(updatedGame);
             GameSocketActions.emitRoundStatusChanged(gameId, determinedRoundStatus, socketServer);
+            if (determinedRoundStatus === RoundStatus.CZAR_SELECT){
+                const cards = updatedGame.players.map(player => player.playedCards);
+                GameSocketActions.emitCzarPickingCards(gameId, cards, socketServer);
+            }
         }
 
         return determinedRoundStatus;
+    }
+
+    public static async czarPickedCard(gameId: string, cardId: string, socket: SocketIO.Socket, socketServer: Server): Promise<void> {
+        const game = await Game.findById(gameId);
+        const canPlayerChooseCard = await GameValidator.canCzarPickCard(game, socket.id, cardId);
+        if(canPlayerChooseCard == CanCzarPickCardResult.YES){
+            const winningPlayer = game.players.filter(player => player.playedCards.find(card => card.card.id == cardId))[0];
+            winningPlayer.score++
+            await Player.update(winningPlayer);
+            const roundResult: RoundResult = {
+                winningPlayer: winningPlayer,
+                winningCards: winningPlayer.playedCards
+            };
+            GameSocketActions.emitRoundFinished(gameId, roundResult, socketServer);
+        }
     }
 
     public static async playCards(gameId: string, cardIds: ChosenCardModel[], socket: SocketIO.Socket, socketServer: Server): Promise<void> {
@@ -108,7 +128,7 @@ export class GameManager {
         const game = await Game.findById(gameId);
         const playerId = socket.id;
         if(!game.players.some(x => x.id === playerId)){
-            const player:PlayerModel = { id: playerId, gameId: gameId, cards: [], playedCards: []};
+            const player:PlayerModel = { id: playerId, gameId: gameId, cards: [], playedCards: [], score: 0};
             game.players.push(player);
 
             socket.join(game._id);    
@@ -133,7 +153,7 @@ export class GameManager {
                 console.log(`Game '${game.name} closed`)
                 LobbySocketActions.emitLobbyRemoved(game, socketServer);
             }else{
-                const player:PlayerModel = { id: userId, gameId: game._id, cards: [], playedCards: []};
+                const player = game.players.find(player => player.id === userId);
                 game.players = game.players.filter((player) => player.id !== userId);
                 const updatedGame: GameModel = await Game.update(game);
 

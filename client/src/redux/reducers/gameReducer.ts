@@ -2,8 +2,6 @@ import { GameKeys } from '../../components/Game/redux/keys';
 import * as actions from '../../components/Game/redux/actions'
 import { gameState } from '../store/initialStates';
 import { IGameState } from '../store/IStoreStates';
-import { PlayerModel } from '../../models/PlayerModel';
-import { CardType } from '../../models/CardModel';
 
 type GameActions = 
      actions.IJoinedGame
@@ -12,9 +10,11 @@ type GameActions =
      & actions.IGameStarted
      & actions.IPlayerRecievedCard
      & actions.IPlayerChoseCards
-     & actions.IRoundStatusChanged;
+     & actions.IRoundStatusChanged
+     & actions.ICzarPickingCard
+     & actions.IRoundFinished;
 
-export default function lobbyReducer(state = gameState, action: GameActions): IGameState {
+export default function gameReducer(state = gameState, action: GameActions): IGameState {
     switch (action.type) {
         
         case GameKeys.JOINED_GAME:
@@ -106,6 +106,24 @@ export default function lobbyReducer(state = gameState, action: GameActions): IG
                 activeGame: {
                     ...state.activeGame,
                     roundStatus: action.roundStatus
+                }
+            }
+
+        case GameKeys.CZAR_PICKING_CARDS:
+            return {
+                ...state,
+                activeGame: {
+                    ...state.activeGame,
+                    roundsSelectedCards: action.roundsSelectedCards
+                }
+            }
+
+        case GameKeys.ROUND_FINISHED:
+            return {
+                ...state,
+                activeGame: {
+                    ...state.activeGame,
+                    roundResult: action.roundResult                 
                 }
             }
 
